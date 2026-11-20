@@ -1,0 +1,18 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  padding: calc(8 * var(--u)) calc(16 * var(--u)) calc(8 * var(--u)) calc(12 * var(--u));
+  color: var(--white);
+}
+
+/* Figma 850:1946: 8x8 Tertiary/Green dot */
+.dot {
+  width: calc(8 * var(--u));
+  height: calc(8 * var(--u));
+  min-width: 6px;
+  min-height: 6px;
+  border-radius: 50%;
+  background: var(--green-400);
+  flex: none;
+}

@@ -1,0 +1,58 @@
+/* Figma: height 52, padding 0 24, radius 4, Body 18/28, no border/shadow.
+   Hover / active / focus / disabled are not in Figma (build decision). */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(8 * var(--u));
+  min-height: max(calc(52 * var(--u)), var(--min-tap));
+  padding: 0 calc(24 * var(--u));
+  border: 0;
+  border-radius: var(--radius-button);
+  font-family: var(--font-sans);
+  font-size: max(calc(var(--fs-body) * var(--u)), var(--min-body));
+  line-height: calc(var(--lh-body) / var(--fs-body));
+  font-weight: 400;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.primary {
+  background: var(--white);
+  color: var(--black);
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--neutral-200);
+}
+
+.secondary {
+  background: var(--neutral-900);
+  color: var(--white);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--neutral-800);
+}
+
+.block {
+  display: flex;
+  width: 100%;
+}

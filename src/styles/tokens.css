@@ -1,0 +1,171 @@
+/*
+ * Xpansly design tokens.
+ * Source of truth: Figma file Ly0R84ThdJJDDjKsaRWhth (see docs/spec/00-tokens.md).
+ *
+ * RESPONSIVE MODEL: fixed side margins, scaled content.
+ * Each breakpoint has a reference design width (--ref) and a fixed margin (--margin).
+ * --scale = (viewport - 2 * margin) / (ref - 2 * margin), capped at 1.5 on wide screens.
+ * --u is "one design pixel at the reference width", expressed in rem so the user's
+ * font-size setting still scales everything. Components size things as
+ * calc(<figma px> * var(--u)) and never hard-code px.
+ */
+
+:root {
+  /* ---------- Colour: paint styles ---------- */
+  --white: #ffffff;
+  --black: #0a0a0a;
+
+  --neutral-50: #fafafa;
+  --neutral-100: #f5f5f5;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-400: #a3a3a3;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #404040;
+  --neutral-800: #262626;
+  --neutral-900: #171717;
+  --neutral-950: #0a0a0a;
+
+  --purple-50: #f4e3ff; --purple-100: #ebccff; --purple-200: #dca4ff; --purple-300: #c769ff; --purple-400: #b231ff;
+  --purple-500: #a00aff; --purple-600: #8c00f4; --purple-700: #7303c0; --purple-800: #62049f; --purple-900: #420079;
+  --blue-50: #d4f0ff; --blue-100: #b2e6ff; --blue-200: #7dd8ff; --blue-300: #40bfff; --blue-400: #149dff;
+  --blue-500: #007bff; --blue-600: #0063ff; --blue-700: #0052d4; --blue-800: #0846a0; --blue-900: #0a2b61;
+  --orange-50: #fff0d3; --orange-100: #ffdca5; --orange-200: #ffc26d; --orange-300: #ff9d32; --orange-400: #ff7f0a;
+  --orange-500: #e65c00; --orange-600: #cc4902; --orange-700: #a1390b; --orange-800: #82310c; --orange-900: #461604;
+  --violet-50: #fce7f8; --violet-100: #fbcff3; --violet-200: #faa7e8; --violet-300: #f571d6; --violet-400: #ec38bc;
+  --violet-500: #dd25a3; --violet-600: #bf1785; --violet-700: #9e166e; --violet-800: #84175d; --violet-900: #510636;
+  --cyan-50: #cff7fe; --cyan-100: #9cecfb; --cyan-200: #68dff8; --cyan-300: #23c7ed; --cyan-400: #07aad3;
+  --cyan-500: #0987b1; --cyan-600: #0f6c8f; --cyan-700: #165974; --cyan-800: #174a62; --cyan-900: #083044;
+  --moss-50: #ebe8dc; --moss-100: #d9d4bd; --moss-200: #c0b896; --moss-300: #a89f73; --moss-400: #8c8456;
+  --moss-500: #6e6842; --moss-600: #605c3c; --moss-700: #46442e; --moss-800: #3d3c2a; --moss-900: #201f13;
+  --red-50: #ffe2e1; --red-100: #ffcac8; --red-200: #ffa4a1; --red-300: #fe706b; --red-400: #f6433d;
+  --red-500: #e52d27; --red-600: #c01a15; --red-700: #9e1a16; --red-800: #831c19; --red-900: #480907;
+  --green-50: #e2f6e2; --green-100: #c6ecc6; --green-200: #99dc9b; --green-300: #65c368; --green-400: #45b649;
+  --green-500: #308933; --green-600: #286d2b; --green-700: #245726; --green-800: #1f4821; --green-900: #0c270e;
+  --yellow-50: #fefbc3; --yellow-100: #fdf28b; --yellow-200: #fce448; --yellow-300: #f9d423; --yellow-400: #e9b809;
+  --yellow-500: #c98f05; --yellow-600: #a06608; --yellow-700: #84500f; --yellow-800: #704213; --yellow-900: #422206;
+
+  /* Semantic */
+  --bg: var(--neutral-950);
+  --text: var(--white);
+  --text-body: var(--neutral-300);
+  --text-muted: var(--neutral-400);
+  --accent: var(--purple-300);
+
+  /* Illustration status colours (mockups only) */
+  --status-live: #4ade80;
+  --status-warming: #f9d423;
+  --status-signal: var(--purple-300);
+
+  /* Focus ring */
+  --focus: var(--purple-200);
+
+  /* ---------- Responsive scale system ---------- */
+  /* Mobile first: < 768 */
+  --ref: 390;
+  --margin-n: 20;
+  --cols: 4;
+  --gutter-n: 12;
+  --scale-max: 1.5;
+
+  --margin: calc(var(--margin-n) * 1px);
+  /* --vw is set from JS (clientWidth, excludes scrollbar); falls back to 100vw */
+  --scale-raw: tan(atan2(var(--vw, 100vw) - 2 * var(--margin), (var(--ref) - 2 * var(--margin-n)) * 1px));
+  --scale: min(var(--scale-raw), var(--scale-max));
+  /* One design pixel at the reference width, in rem */
+  --u: calc(var(--scale) * 0.0625rem);
+
+  --gutter: calc(var(--gutter-n) * var(--u));
+  --content-ref: calc(var(--ref) - 2 * var(--margin-n));
+  --content-max: calc(var(--content-ref) * var(--u));
+
+  /* ---------- Type scale (size / line-height at the reference width) ---------- */
+  --fs-display: 40;  --lh-display: 48;
+  --fs-h1: 34;       --lh-h1: 40;
+  --fs-h2: 20;       --lh-h2: 28;
+  --fs-body-lg: 18;  --lh-body-lg: 26;
+  --fs-body: 16;     --lh-body: 24;
+  --fs-body-sm: 16;  --lh-body-sm: 24;
+  --fs-caption: 14;  --lh-caption: 20;
+  --fs-label: 13;    --lh-label: 18;
+  --fs-label-xs: 12; --lh-label-xs: 16;
+
+  /* Minimums (accessibility clamps) */
+  --min-body: 1rem;        /* body text never below 16px */
+  --min-caption: 0.8125rem;
+  --min-label: 0.75rem;    /* labels never below 12px */
+  --min-tap: 2.75rem;      /* 44px tap targets */
+
+  /* ---------- Fonts ---------- */
+  --font-display: var(--font-recia), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* ---------- Glass recipe (one set, reused everywhere) ---------- */
+  --glass-fill: rgb(255 255 255 / 0.06);
+  --glass-border: rgb(255 255 255 / 0.16);
+  --glass-blur: 8px; /* Figma background blur 16 = CSS blur(8px) */
+  --glass-filter: blur(var(--glass-blur)) saturate(140%);
+  --glass-fallback: rgb(28 28 28 / 0.94);
+  --glass-radius: calc(20 * var(--u));
+  --glass-rim: calc(12 * var(--u));
+  --radius-pill: 999px;
+  --radius-button: calc(4 * var(--u));
+
+  /* ---------- Motion ---------- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 180ms;
+  --dur-med: 350ms;
+  --dur-slow: 450ms;
+
+  --nav-h: calc(102 * var(--u));
+}
+
+/* Tablet 768 to 1199 */
+@media (min-width: 768px) {
+  :root {
+    --ref: 834;
+    --margin-n: 40;
+    --cols: 8;
+    --gutter-n: 16;
+
+    --fs-display: 56;  --lh-display: 64;
+    --fs-h1: 44;       --lh-h1: 52;
+    --fs-h2: 22;       --lh-h2: 30;
+    --fs-body-lg: 18;  --lh-body-lg: 26;
+    --fs-body: 17;     --lh-body: 26;
+    --fs-body-sm: 16;  --lh-body-sm: 24;
+    --fs-caption: 14;  --lh-caption: 20;
+    --fs-label: 13;    --lh-label: 18;
+    --fs-label-xs: 12; --lh-label-xs: 16;
+  }
+}
+
+/* Desktop 1200+ (wide keeps scaling from 1440 up to the 1.5 cap, then centres) */
+@media (min-width: 1200px) {
+  :root {
+    --ref: 1440;
+    --margin-n: 80;
+    --cols: 12;
+    --gutter-n: 16;
+
+    --fs-display: 72;  --lh-display: 80;
+    --fs-h1: 54;       --lh-h1: 64;
+    --fs-h2: 24;       --lh-h2: 32;
+    --fs-body-lg: 20;  --lh-body-lg: 28;
+    --fs-body: 18;     --lh-body: 28;
+    --fs-body-sm: 16;  --lh-body-sm: 24;
+    --fs-caption: 14;  --lh-caption: 20;
+    --fs-label: 14;    --lh-label: 20;
+    --fs-label-xs: 13; --lh-label-xs: 16;
+  }
+}
+
+/* Browsers without trig functions: content still fits, it just does not scale. */
+@supports not (width: calc(tan(atan2(1px, 1px)) * 1px)) {
+  :root {
+    --scale: 1;
+  }
+}

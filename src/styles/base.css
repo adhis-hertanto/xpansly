@@ -1,0 +1,245 @@
+/* Reset, base elements, text styles, layout and glass utilities. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  color-scheme: dark;
+  background: var(--bg);
+  /* Lenis handles smooth scroll; native fallback for in-page links */
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--nav-h);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: max(calc(var(--fs-body) * var(--u)), var(--min-body));
+  line-height: calc(var(--lh-body) / var(--fs-body));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+img,
+picture,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  overflow-wrap: break-word;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--purple-700);
+  color: var(--white);
+}
+
+/* ---------- Text styles (Figma group "Landing page") ---------- */
+.t-display,
+.t-h1,
+.t-h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.t-display {
+  font-size: calc(var(--fs-display) * var(--u));
+  line-height: calc(var(--lh-display) / var(--fs-display));
+}
+
+.t-h1 {
+  font-size: calc(var(--fs-h1) * var(--u));
+  line-height: calc(var(--lh-h1) / var(--fs-h1));
+}
+
+.t-h2 {
+  font-size: max(calc(var(--fs-h2) * var(--u)), 1.125rem);
+  line-height: calc(var(--lh-h2) / var(--fs-h2));
+}
+
+.t-body-lg {
+  font-size: max(calc(var(--fs-body-lg) * var(--u)), var(--min-body));
+  line-height: calc(var(--lh-body-lg) / var(--fs-body-lg));
+}
+
+.t-body {
+  font-size: max(calc(var(--fs-body) * var(--u)), var(--min-body));
+  line-height: calc(var(--lh-body) / var(--fs-body));
+}
+
+.t-body-sm {
+  font-size: max(calc(var(--fs-body-sm) * var(--u)), var(--min-body));
+  line-height: calc(var(--lh-body-sm) / var(--fs-body-sm));
+}
+
+.t-caption {
+  font-size: max(calc(var(--fs-caption) * var(--u)), var(--min-caption));
+  line-height: calc(var(--lh-caption) / var(--fs-caption));
+}
+
+.t-label,
+.t-label-sm,
+.t-label-xs {
+  font-family: var(--font-mono);
+  font-weight: 400;
+}
+
+.t-label,
+.t-label-sm {
+  font-size: max(calc(var(--fs-label) * var(--u)), var(--min-label));
+  line-height: calc(var(--lh-label) / var(--fs-label));
+}
+
+.t-label {
+  text-transform: uppercase;
+}
+
+.t-label-xs {
+  font-size: max(calc(var(--fs-label-xs) * var(--u)), var(--min-label));
+  line-height: calc(var(--lh-label-xs) / var(--fs-label-xs));
+}
+
+/* ---------- Layout ---------- */
+
+/* Content box: fixed side margins, centred once the scale is capped (wide screens). */
+.container {
+  width: min(100%, calc(var(--content-max) + 2 * var(--margin)));
+  margin-inline: auto;
+  padding-inline: var(--margin);
+}
+
+/* Column grid: 4 / 8 / 12 columns, scaled gutter. Children use grid-column. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+
+/* ---------- Glass ---------- */
+.glass {
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--glass-radius);
+  -webkit-backdrop-filter: var(--glass-filter);
+  backdrop-filter: var(--glass-filter);
+}
+
+/* Glass container that wraps a card with a 12px rim */
+.glass-rim {
+  padding: var(--glass-rim);
+}
+
+.glass-pill {
+  border-radius: var(--radius-pill);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--glass-fallback);
+  }
+}
+
+/* ---------- Utilities ---------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1000;
+  padding: 0.75rem 1rem;
+  background: var(--white);
+  color: var(--black);
+  border-radius: 4px;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* ---------- Reduced motion: every animation respects it ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
