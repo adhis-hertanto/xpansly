@@ -52,11 +52,11 @@ function makeChrome() {
 
 function makeGlass() {
   const m = new MeshPhysicalMaterial({
-    color: new Color("#dfe6f2"),
+    color: new Color("#cfd8ea"),
     metalness: 0,
     roughness: 0.06,
     transparent: true,
-    opacity: 0.32,
+    opacity: 0.16,
     ior: 1.5,
     specularIntensity: 1,
     clearcoat: 1,
@@ -71,8 +71,8 @@ function makeGlass() {
       "#include <dithering_fragment>",
       /* glsl */ `
       float fresnelEdge = pow(1.0 - clamp(abs(dot(normalize(vNormal), normalize(vViewPosition))), 0.0, 1.0), 2.6);
-      gl_FragColor.a = clamp(mix(diffuseColor.a, 1.0, fresnelEdge * 0.9), 0.0, 1.0);
-      gl_FragColor.rgb *= mix(1.0, 1.6, fresnelEdge);
+      gl_FragColor.a = clamp(mix(diffuseColor.a, 1.0, fresnelEdge * 0.95), 0.0, 1.0);
+      gl_FragColor.rgb *= mix(0.8, 2.2, fresnelEdge);
       #include <dithering_fragment>`,
     );
   };

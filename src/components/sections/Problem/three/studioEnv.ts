@@ -38,7 +38,7 @@ export function buildStudio() {
   };
 
   // Wall behind the camera: horizontal bands from dark to bright.
-  const bands = [0.03, 0.5, 0.1, 1.3, 0.15, 0.4, 0.06];
+  const bands = [0.03, 0.4, 0.1, 0.95, 0.15, 0.35, 0.06];
   const bandH = 3;
   bands.forEach((lum, i) => {
     panel(30, bandH, lum, 0, (i - (bands.length - 1) / 2) * bandH, 14);

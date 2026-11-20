@@ -2,9 +2,8 @@
 
 import { useEffect, useLayoutEffect, useRef, type MutableRefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Bloom, EffectComposer, ToneMapping } from "@react-three/postprocessing";
-import { ToneMappingMode } from "postprocessing";
-import { ACESFilmicToneMapping, MathUtils, NoToneMapping, PMREMGenerator, type PerspectiveCamera } from "three";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import { MathUtils, NoToneMapping, PMREMGenerator, type PerspectiveCamera } from "three";
 import { buildStudio } from "./studioEnv";
 import { CubeMark, type MarkMaterial } from "./CubeMark";
 import { MARK_SIZE, type Quality } from "./markData";
@@ -102,14 +101,15 @@ export function Scene({
         antialias: !high,
         alpha: false,
         powerPreference: "high-performance",
-        toneMapping: high ? NoToneMapping : ACESFilmicToneMapping,
+        // No tone mapping: the composer would crush the #0a0a0a background, so both paths stay linear->sRGB.
+        toneMapping: NoToneMapping,
         toneMappingExposure: 1,
       }}
       style={{ position: "absolute", inset: 0 }}
     >
       <color attach="background" args={["#0a0a0a"]} />
       <Framing />
-      <Studio intensity={glass ? 1.1 : 0.9} />
+      <Studio intensity={glass ? 0.55 : 0.9} />
       {/* Key accent from the upper left, and a very subtle purple rim from behind right. */}
       <directionalLight position={[-4, 5, 6]} intensity={1.4} color="#ffffff" />
       <pointLight position={[6, 2, -4]} intensity={30} distance={20} decay={1.5} color="#8c00f4" />
@@ -117,8 +117,7 @@ export function Scene({
       {high && (
         <EffectComposer multisampling={4} enableNormalPass={false}>
           <Bloom mipmapBlur intensity={0.25} luminanceThreshold={1.15} luminanceSmoothing={0.25} radius={0.55} />
-          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
-        </EffectComposer>
+                  </EffectComposer>
       )}
       <ReadyPing onReady={onReady} />
     </Canvas>
