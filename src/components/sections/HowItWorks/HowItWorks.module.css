@@ -1,0 +1,107 @@
+.section {
+  padding-block: calc(80 * var(--u));
+}
+
+.header {
+  margin-bottom: calc(40 * var(--u));
+}
+
+.headline {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--white);
+}
+
+.line {
+  display: inline;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gutter);
+  align-items: stretch;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--neutral-900);
+  border: 1px solid var(--neutral-800);
+  border-radius: calc(12 * var(--u));
+  overflow: hidden;
+}
+
+.text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(12 * var(--u));
+  padding: calc(28 * var(--u));
+}
+
+.title {
+  color: var(--white);
+}
+
+.body {
+  color: var(--neutral-300);
+}
+
+.divider {
+  height: 1px;
+  background: var(--neutral-800);
+}
+
+.well {
+  padding: calc(28 * var(--u));
+}
+
+.stage {
+  display: block;
+  width: 100%;
+  aspect-ratio: 574 / 400;
+  border-radius: calc(20 * var(--u));
+  overflow: hidden;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding-block: calc(120 * var(--u));
+  }
+
+  .header {
+    margin-bottom: calc(56 * var(--u));
+  }
+
+  .line {
+    display: block;
+  }
+
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .section {
+    padding-block: calc(160 * var(--u));
+  }
+
+  .header {
+    margin-bottom: calc(64 * var(--u));
+  }
+
+  /* Figma: headline spans columns 2-11 (1064 wide). */
+  .headline {
+    grid-column: 2 / span 10;
+  }
+}

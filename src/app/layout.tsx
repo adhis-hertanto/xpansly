@@ -33,7 +33,12 @@ const vwScript = `(function(){var d=document.documentElement;function s(){d.styl
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB" className={`${GeistSans.variable} ${GeistMono.variable} ${recia.variable}`}>
+    <html
+      lang="en-GB"
+      className={`${GeistSans.variable} ${GeistMono.variable} ${recia.variable}`}
+      // The pre-paint --vw script sets an inline style on <html> before hydration.
+      suppressHydrationWarning
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: vwScript }} />
       </head>
