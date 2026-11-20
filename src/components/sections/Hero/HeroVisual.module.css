@@ -1,0 +1,77 @@
+/*
+ * Stage = Figma 850:1957 (524 x 608). Every child is positioned in percentages of the stage
+ * and sized with container-query units, so the whole composition scales with its width.
+ * Coordinates (x, y, w) are Figma pixels relative to the stage.
+ */
+.stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 524 / 608;
+  container-type: inline-size;
+}
+
+.stage .card {
+  position: absolute;
+  padding: calc(12 / 524 * 100cqw);
+  border-radius: calc(20 / 524 * 100cqw);
+  animation: rise 520ms var(--ease-out) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Mira message 858:141: 477 x 125 at (25, 0) */
+.stage .mira {
+  --delay: 0ms;
+  left: calc(25 / 524 * 100%);
+  top: 0;
+  width: calc(477 / 524 * 100%);
+}
+
+/* Accounts 858:142: 502 x 271 at (13, 143) */
+.stage .accounts {
+  --delay: 90ms;
+  left: calc(13 / 524 * 100%);
+  top: calc(143 / 608 * 100%);
+  width: calc(502 / 524 * 100%);
+}
+
+/* Next move 858:143: 302 x 176 at (123, 432) */
+.stage .next {
+  --delay: 180ms;
+  left: calc(123 / 524 * 100%);
+  top: calc(432 / 608 * 100%);
+  width: calc(302 / 524 * 100%);
+}
+
+/* Cursor "You" 848:21173: 50 x 34 at (235, 559) */
+.cursor {
+  position: absolute;
+  left: calc(235 / 524 * 100%);
+  top: calc(559 / 608 * 100%);
+  width: calc(51 / 524 * 100%);
+  height: auto;
+  animation: rise 520ms var(--ease-out) 260ms both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage .card,
+  .cursor {
+    animation: none;
+  }
+}

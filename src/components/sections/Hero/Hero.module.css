@@ -1,0 +1,146 @@
+/*
+ * Figma 849:147: padding 96 80 100 80 below the 102px nav, 12-col row (left cols 1-7, right cols 8-12),
+ * left column gap 40, intro gap 16, sign-up gap 20. The background runs behind the nav.
+ */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--black);
+  /* nav (16 + bar + 16) plus breathing room; the desktop value is Figma 102 + 96 */
+  padding-top: calc(144 * var(--u));
+  padding-bottom: calc(72 * var(--u));
+}
+
+/* ---------- Background art + scrim ---------- */
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--black);
+}
+
+.bgImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: 66% 40%;
+}
+
+/* Figma 848:16501: #0A0A0A alpha 1 at 0%, .6 at 19.231%, 0 at 47.596%, bottom to top */
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    #0a0a0a 0%,
+    rgb(10 10 10 / 0.6) 19.231%,
+    rgb(10 10 10 / 0) 47.596%
+  );
+}
+
+/* ---------- Layout ---------- */
+.grid {
+  row-gap: calc(56 * var(--u));
+  align-items: start;
+}
+
+.copy {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(32 * var(--u));
+  min-width: 0;
+}
+
+.visual {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(16 * var(--u));
+}
+
+.title {
+  color: var(--white);
+  text-wrap: wrap;
+}
+
+.body {
+  max-width: calc(524 * var(--u));
+  color: var(--white);
+}
+
+.signup {
+  display: flex;
+  flex-direction: column;
+  gap: calc(20 * var(--u));
+  max-width: calc(524 * var(--u));
+}
+
+.caption {
+  color: var(--neutral-400);
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding-top: calc(160 * var(--u));
+    padding-bottom: calc(96 * var(--u));
+  }
+
+  .copy {
+    gap: calc(40 * var(--u));
+  }
+
+  .signup {
+    max-width: calc(640 * var(--u));
+  }
+
+  .body {
+    max-width: calc(640 * var(--u));
+  }
+
+  /* Tablet: illustration below, centred, capped so it does not dwarf the copy */
+  .visual {
+    justify-self: center;
+    width: min(100%, calc(640 * var(--u)));
+  }
+}
+
+@media (min-width: 1200px) {
+  .hero {
+    padding-top: calc(198 * var(--u));
+    padding-bottom: calc(100 * var(--u));
+  }
+
+  .bg {
+    bottom: auto;
+    height: calc(907 * var(--u));
+  }
+
+  .bgImg {
+    height: calc(889 * var(--u));
+    object-position: center;
+  }
+
+  .copy {
+    grid-column: 1 / span 7;
+  }
+
+  .visual {
+    grid-column: 8 / span 5;
+    justify-self: stretch;
+    width: auto;
+  }
+
+  .body,
+  .signup {
+    max-width: calc(524 * var(--u));
+  }
+}

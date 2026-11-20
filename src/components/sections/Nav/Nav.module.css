@@ -1,0 +1,236 @@
+/*
+ * Figma 849:146 / 848:24727: floating glass bar, 801 x 70 at 1440, radius 8,
+ * padding 8 8 8 16, gap 80, 16 from the top. Mobile-first: menu button + sheet.
+ */
+.header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 100;
+  padding: calc(16 * var(--u)) var(--margin);
+  /* the header spans the viewport; only the bar and sheet take clicks */
+  pointer-events: none;
+}
+
+.nav {
+  display: flex;
+  justify-content: center;
+}
+
+.bar {
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(16 * var(--u));
+  width: 100%;
+  max-width: calc(var(--content-max));
+  padding: calc(8 * var(--u)) calc(8 * var(--u)) calc(8 * var(--u)) calc(16 * var(--u));
+  border-radius: calc(8 * var(--u));
+}
+
+.logo {
+  display: block;
+  flex: none;
+  line-height: 0;
+  border-radius: 4px;
+}
+
+.logo img {
+  width: calc(133 * var(--u));
+  min-width: 100px;
+  height: auto;
+}
+
+/* Desktop-only items are hidden until the 1200 breakpoint */
+.links,
+.bar .cta {
+  display: none;
+}
+
+.links {
+  list-style: none;
+  padding: 0;
+  gap: calc(40 * var(--u));
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--min-tap);
+  color: var(--neutral-300);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.link:hover {
+  color: var(--white);
+}
+
+/* ---------- Menu button (below 1200) ---------- */
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: var(--min-tap);
+  min-height: var(--min-tap);
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  border-radius: calc(4 * var(--u));
+  color: var(--white);
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.menuButton:hover {
+  background: rgb(255 255 255 / 0.08);
+}
+
+.burger {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 12px;
+}
+
+.burger span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    top var(--dur-med) var(--ease-out);
+}
+
+.burger span:first-child {
+  top: 1px;
+}
+
+.burger span:last-child {
+  top: 9px;
+}
+
+.menuButton[aria-expanded="true"] .burger span:first-child {
+  top: 5px;
+  transform: rotate(45deg);
+}
+
+.menuButton[aria-expanded="true"] .burger span:last-child {
+  top: 5px;
+  transform: rotate(-45deg);
+}
+
+/* ---------- Full-height glass sheet ---------- */
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(32 * var(--u));
+  padding: calc(112 * var(--u)) var(--margin) max(calc(40 * var(--u)), env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgb(10 10 10 / 0.78);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+  transition:
+    opacity var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out),
+    visibility 0s linear var(--dur-med);
+}
+
+.sheetOpen {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+
+.sheetList {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  border-top: 1px solid var(--glass-border);
+}
+
+.sheetList li {
+  border-bottom: 1px solid var(--glass-border);
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out);
+}
+
+.sheetOpen .sheetList li {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(60ms + var(--i, 0) * 50ms);
+}
+
+.sheetLink {
+  display: flex;
+  align-items: center;
+  min-height: max(calc(64 * var(--u)), var(--min-tap));
+  color: var(--white);
+  text-decoration: none;
+}
+
+.sheetLink:hover {
+  color: var(--neutral-300);
+}
+
+.sheetCta {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .bar {
+    padding-right: calc(8 * var(--u));
+  }
+}
+
+/* ---------- Desktop: the Figma bar ---------- */
+@media (min-width: 1200px) {
+  .bar {
+    width: fit-content;
+    gap: calc(80 * var(--u));
+  }
+
+  .links {
+    display: flex;
+  }
+
+  .bar .cta {
+    display: inline-flex;
+  }
+
+  .menuButton,
+  .sheet {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .sheetList li,
+  .burger span {
+    transition: none;
+  }
+}

@@ -1,17 +1,19 @@
-import { Chip } from "@/components/ui";
-import { Section } from "@/components/ui";
+import { Chip, Section } from "@/components/ui";
 import { sectionIds } from "@/config/site";
 import { EarlyAccessForm } from "./EarlyAccessForm";
 import styles from "./CtaFooter.module.css";
 
 /**
- * Be first in. + footer (Figma 848:24337). One section: the background art and scrim span
- * both the CTA and the footer; the footer is transparent so the art shows through.
+ * Be first in. + footer (Figma 848:24337).
+ * CtaSection renders inside <main>. SiteFooter renders directly after </main> so it is a real
+ * contentinfo landmark. The background art and scrim live in CtaSection and extend under the footer
+ * (the section reserves --footer-h of bottom padding; SiteFooter is pulled up over it with a negative
+ * margin and is transparent), so the two read as one 1083-high frame with no gap.
  */
 
 const BG = "/assets/cta/cta-bg";
 
-export function CtaFooter() {
+export function CtaSection() {
   return (
     <Section id={sectionIds.cta} labelledBy="cta-title" contained={false} className={styles.section}>
       {/* Decorative art, native 1520x980, cover-fitted across CTA + footer. */}
@@ -58,26 +60,41 @@ export function CtaFooter() {
           </div>
         </div>
       </div>
-
-      <footer className={styles.footer}>
-        {/* Not in Figma (848:24337 has no footer logo); added on request. Remove this img to match Figma exactly. */}
-        <img
-          src="/assets/brand/xpansly-logo.svg"
-          width={133}
-          height={40}
-          alt="Xpansly"
-          loading="lazy"
-          decoding="async"
-          className={styles.logo}
-        />
-        <p className={`t-label-sm ${styles.legal}`}>
-          © 2026 Xpansly · GDPR-native · Built in the UK ·{" "}
-          {/* TODO(privacy): /privacy does not exist yet; build the page or update this href. */}
-          <a href="/privacy" className={styles.link}>
-            Privacy Policy
-          </a>
-        </p>
-      </footer>
     </Section>
+  );
+}
+
+export function SiteFooter() {
+  return (
+    <footer className={styles.footer}>
+      {/* Not in Figma (848:24337 has no footer logo); added on request. Remove this img to match Figma exactly. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- static export, small SVG: next/image adds nothing */}
+      <img
+        src="/assets/brand/xpansly-logo.svg"
+        width={133}
+        height={40}
+        alt="Xpansly"
+        loading="lazy"
+        decoding="async"
+        className={styles.logo}
+      />
+      <p className={`t-label-sm ${styles.legal}`}>
+        © 2026 Xpansly · GDPR-native · Built in the UK ·{" "}
+        {/* TODO(privacy): /privacy does not exist yet; build the page or update this href. */}
+        <a href="/privacy" className={styles.link}>
+          Privacy Policy
+        </a>
+      </p>
+    </footer>
+  );
+}
+
+/** Temporary alias for the old single export (renders both inside <main>). Drop once page.tsx uses the two components. */
+export function CtaFooter() {
+  return (
+    <>
+      <CtaSection />
+      <SiteFooter />
+    </>
   );
 }

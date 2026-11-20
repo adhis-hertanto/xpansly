@@ -1,5 +1,13 @@
+/* Footer zone height (Figma footer 85 plus the added logo). Shared by the section (bottom padding,
+   so the art runs under the footer) and SiteFooter (pulled up over it). */
+.section,
+.footer {
+  --footer-h: max(calc(140 * var(--u)), 9.5rem);
+}
+
 .section {
   position: relative;
+  padding-bottom: var(--footer-h);
   isolation: isolate;
   overflow: clip;
   background: var(--black);
@@ -76,13 +84,19 @@
 
 /* ---------- Footer ---------- */
 .footer {
+  position: relative;
+  z-index: 1;
+  margin-top: calc(-1 * var(--footer-h));
+  min-height: var(--footer-h);
   border-top: 1px solid var(--neutral-800);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: calc(16 * var(--u));
   padding: calc(24 * var(--u)) var(--margin);
   text-align: center;
+  background: transparent;
 }
 
 .logo {
@@ -122,6 +136,11 @@
 
   .formCard {
     padding: calc(32 * var(--u));
+  }
+
+  .section,
+  .footer {
+    --footer-h: calc(135 * var(--u));
   }
 
   .footer {
