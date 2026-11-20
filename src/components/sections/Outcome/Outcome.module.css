@@ -14,6 +14,7 @@
 .title {
   color: var(--white);
   max-width: calc(720 * var(--u));
+  text-wrap: wrap; /* Figma breaks after "can"; balanced wrapping would not */
 }
 
 .lede {

@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode, Ref, SelectHTMLAttributes } from "react";
 import styles from "./Field.module.css";
 
 type BaseProps = {
@@ -17,8 +17,9 @@ export function TextField({
   hideLabel,
   error,
   className,
+  ref,
   ...input
-}: BaseProps & InputHTMLAttributes<HTMLInputElement>) {
+}: BaseProps & InputHTMLAttributes<HTMLInputElement> & { ref?: Ref<HTMLInputElement> }) {
   const errId = `${id}-error`;
   return (
     <div className={[styles.field, className].filter(Boolean).join(" ")}>
@@ -26,6 +27,7 @@ export function TextField({
         {label}
       </label>
       <input
+        ref={ref}
         id={id}
         className={`t-body ${styles.control}`}
         aria-invalid={error ? true : undefined}
@@ -45,8 +47,14 @@ export function SelectField({
   className,
   placeholder,
   children,
+  ref,
   ...select
-}: BaseProps & SelectHTMLAttributes<HTMLSelectElement> & { placeholder?: string; children: ReactNode }) {
+}: BaseProps &
+  SelectHTMLAttributes<HTMLSelectElement> & {
+    placeholder?: string;
+    children: ReactNode;
+    ref?: Ref<HTMLSelectElement>;
+  }) {
   const errId = `${id}-error`;
   return (
     <div className={[styles.field, className].filter(Boolean).join(" ")}>
@@ -55,6 +63,7 @@ export function SelectField({
       </label>
       <div className={styles.selectWrap}>
         <select
+          ref={ref}
           id={id}
           className={`t-body ${styles.control} ${styles.select}`}
           aria-invalid={error ? true : undefined}
