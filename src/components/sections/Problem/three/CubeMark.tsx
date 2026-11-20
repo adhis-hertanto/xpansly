@@ -32,7 +32,10 @@ export interface CubeMarkProps {
 }
 
 const TAU = Math.PI * 2;
-const HOVER_RADIUS = 1.5;
+const HOVER_RADIUS = 1.2;
+/** Resting orientation of the formed mark (radians). */
+const POSE_Y = -0.35;
+const POSE_X = 0.18;
 
 const sm = (a: number, b: number, x: number) => {
   x = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -94,12 +97,20 @@ export function CubeMark({ progress, material, quality, idle = 1, offset }: Cube
   const mesh = useRef<InstancedMesh>(null);
   const light = useRef<PointLight>(null);
 
+  // Bevelled cube: 300 tris on high, 108 on low (682 x 300 = 205k and 403 x 108 = 44k tris).
   const geometry = useMemo(() => {
-    const s = U * 0.94;
-    return new RoundedBoxGeometry(s, s, s, 3, U * 0.15);
-  }, []);
+    const s = U * 1.0;
+    return new RoundedBoxGeometry(s, s, s, quality === "high" ? 2 : 1, U * 0.13);
+  }, [quality]);
   const mat = useMemo(() => (material === "glass" ? makeGlass() : makeChrome()), [material]);
   useEffect(() => () => geometry.dispose(), [geometry]);
+  useEffect(() => {
+    const m = mesh.current;
+    if (!m) return;
+    const c = new Color();
+    for (let i = 0; i < count; i++) m.setColorAt(i, c.setScalar(data.shade[i]));
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  }, [count, material, data]);
   useEffect(() => () => mat.dispose(), [mat]);
 
   // Per-instance spring offsets (hover push), reset when the cube count changes.
@@ -179,10 +190,11 @@ export function CubeMark({ progress, material, quality, idle = 1, offset }: Cube
     const o = offsetRef.current;
     g.position.x = o ? o[0] * visW : 0;
     g.position.y = o ? o[1] * visH : 0;
-    const swayY = s.active ? s.ndcX * 0.6 : Math.sin(t * 0.5) * 0.4;
-    const swayX = s.active ? -s.ndcY * 0.35 : Math.sin(t * 0.37 + 1) * 0.15;
-    s.rotY += (swayY * fin * idleK - s.rotY) * Math.min(1, dt * 3.5);
-    s.rotX += (swayX * fin * idleK - s.rotX) * Math.min(1, dt * 3.5);
+    // Resting pose (left and bottom faces visible, like the Figma render) plus sway around it.
+    const swayY = s.active ? s.ndcX * 0.4 : Math.sin(t * 0.5) * 0.14;
+    const swayX = s.active ? -s.ndcY * 0.25 : Math.sin(t * 0.37 + 1) * 0.07;
+    s.rotY += ((POSE_Y + swayY * idleK) * fin - s.rotY) * Math.min(1, dt * 3.5);
+    s.rotX += ((POSE_X + swayX * idleK) * fin - s.rotX) * Math.min(1, dt * 3.5);
     g.rotation.y = s.rotY;
     g.rotation.x = s.rotX;
     g.updateMatrixWorld(true);
@@ -206,7 +218,7 @@ export function CubeMark({ progress, material, quality, idle = 1, offset }: Cube
     const L = light.current;
     if (L) {
       L.position.set(s.lightX, s.lightY, 3);
-      L.intensity = 3 * sm(0.25, 0.9, sp);
+      L.intensity = 1.6 * sm(0.25, 0.9, sp);
     }
 
     const { target: tg, spawn, rot0, spin, swirl, delay, tilt, phase } = data;
@@ -239,16 +251,16 @@ export function CubeMark({ progress, material, quality, idle = 1, offset }: Cube
         if (dd < HOVER_RADIUS) {
           const f = (1 - dd / HOVER_RADIUS) * (1 - dd / HOVER_RADIUS);
           const n = dd || 1;
-          wx = (dx / n) * f * 1.3;
-          wy = (dy / n) * f * 1.3;
-          wz = f * 1.5;
+          wx = (dx / n) * f * 0.9;
+          wy = (dy / n) * f * 0.9;
+          wz = f * 1.2;
         }
       }
       off[i3] += (wx - off[i3]) * spring;
       off[i3 + 1] += (wy - off[i3 + 1]) * spring;
       off[i3 + 2] += (wz - off[i3 + 2]) * spring;
 
-      const shim = Math.sin(t * 0.7 + phase[i]) * 0.05 * fin * idleK;
+      const shim = Math.sin(t * 0.7 + phase[i]) * 0.012 * fin * idleK;
       dummy.position.set(X + off[i3], Y + off[i3 + 1], Z + off[i3 + 2]);
       dummy.rotation.set(
         ((rot0[i3] + t * spin[i * 2]) % TAU) * k + tilt[i3] * e + shim + off[i3 + 1] * 0.8,

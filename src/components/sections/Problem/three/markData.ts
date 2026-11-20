@@ -99,8 +99,10 @@ export interface MarkData {
   swirl: Float32Array;
   /** 0..1 arrival stagger. */
   delay: Float32Array;
-  /** xyz per cube: tiny permanent tilt once locked, gives each facet its own reflection. */
+  /** xyz per cube: tiny permanent tilt (at most ~2 degrees) once locked. */
   tilt: Float32Array;
+  /** Per-cube brightness multiplier (0.8..1.08), so landed faces tile but still differ in tone. */
+  shade: Float32Array;
   /** 0..2PI phase for the idle shimmer. */
   phase: Float32Array;
 }
@@ -157,6 +159,7 @@ export function getMarkData(quality: Quality = "high"): MarkData {
   const delay = new Float32Array(count);
   const tilt = new Float32Array(count * 3);
   const phase = new Float32Array(count);
+  const shade = new Float32Array(count);
 
   const rnd = mulberry32(0x58504c59);
   for (let i = 0; i < count; i++) {
@@ -174,13 +177,14 @@ export function getMarkData(quality: Quality = "high"): MarkData {
     spin[i * 2 + 1] = (rnd() - 0.5) * 1.2;
     swirl[i] = 0.8 + rnd() * 0.9;
     delay[i] = rnd();
-    tilt[i * 3] = (rnd() - 0.5) * 0.3;
-    tilt[i * 3 + 1] = (rnd() - 0.5) * 0.3;
-    tilt[i * 3 + 2] = (rnd() - 0.5) * 0.1;
+    tilt[i * 3] = (rnd() - 0.5) * 0.07;
+    tilt[i * 3 + 1] = (rnd() - 0.5) * 0.07;
+    tilt[i * 3 + 2] = (rnd() - 0.5) * 0.03;
+    shade[i] = 0.8 + rnd() * 0.28;
     phase[i] = rnd() * 6.2832;
   }
 
-  const out: MarkData = { count, frontCount, target, spawn, rot0, spin, swirl, delay, tilt, phase };
+  const out: MarkData = { count, frontCount, target, spawn, rot0, spin, swirl, delay, tilt, phase, shade };
   cache[quality] = out;
   return out;
 }
