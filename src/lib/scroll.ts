@@ -17,11 +17,12 @@ export function getLenis() {
 export function scrollToId(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
-  const offset = -(document.querySelector<HTMLElement>("[data-site-nav]")?.offsetHeight ?? 0);
   if (lenis) {
-    lenis.scrollTo(el, { offset });
+    // Lenis already subtracts the root scroll-padding-top (the nav height, see base.css).
+    lenis.scrollTo(el);
   } else {
-    const top = el.getBoundingClientRect().top + window.scrollY + offset;
+    const pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+    const top = el.getBoundingClientRect().top + window.scrollY - pad;
     window.scrollTo({ top, behavior: "smooth" });
   }
   // Move focus for keyboard and screen reader users without a second jump.

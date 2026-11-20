@@ -15,9 +15,15 @@
 /* ---------- Background art + scrim ---------- */
 .bg {
   position: absolute;
-  inset: 0;
+  inset: 0 0 auto;
+  height: calc(640 * var(--u));
   z-index: -1;
   background: var(--black);
+}
+
+.bg picture {
+  display: block;
+  height: 100%;
 }
 
 .bgImg {
@@ -26,7 +32,7 @@
   height: 100%;
   max-width: none;
   object-fit: cover;
-  object-position: 66% 40%;
+  object-position: 78% 30%;
 }
 
 /* Figma 848:16501: #0A0A0A alpha 1 at 0%, .6 at 19.231%, 0 at 47.596%, bottom to top */
@@ -39,6 +45,14 @@
     rgb(10 10 10 / 0.6) 19.231%,
     rgb(10 10 10 / 0) 47.596%
   );
+}
+
+/* Below desktop the copy sits on top of the planet: dim the art behind the text for contrast */
+.bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgb(10 10 10 / 0.62), rgb(10 10 10 / 0.5) 65%, rgb(10 10 10 / 0));
 }
 
 /* ---------- Layout ---------- */
@@ -94,6 +108,10 @@
     padding-bottom: calc(96 * var(--u));
   }
 
+  .bg {
+    height: calc(900 * var(--u));
+  }
+
   .copy {
     gap: calc(40 * var(--u));
   }
@@ -120,8 +138,11 @@
   }
 
   .bg {
-    bottom: auto;
     height: calc(907 * var(--u));
+  }
+
+  .bg::after {
+    display: none;
   }
 
   .bgImg {
