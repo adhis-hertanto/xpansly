@@ -9,6 +9,13 @@
   padding: calc(16 * var(--u)) var(--margin);
   /* the header spans the viewport; only the bar and sheet take clicks */
   pointer-events: none;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+
+/* Scrolling down slides the whole header (bar + top offset) off screen; scrolling up brings it back.
+   Reduced motion: the global rule makes this an instant swap. */
+.header[data-hidden] {
+  transform: translateY(-100%);
 }
 
 .nav {

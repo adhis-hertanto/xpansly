@@ -40,6 +40,39 @@ export function Nav() {
     if (restoreFocus) buttonRef.current?.focus();
   }, []);
 
+  // Hide on scroll down, reveal on scroll up or near the top. Read once per frame; React only
+  // re-renders when the direction flips. Always shown while the menu is open or focus is inside.
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let frame = 0;
+    const THRESHOLD = 6; // px of travel before the direction counts (ignores jitter)
+    const update = () => {
+      frame = 0;
+      const y = window.scrollY;
+      const navH = headerRef.current?.offsetHeight ?? 0;
+      if (y <= navH) {
+        setHidden(false);
+      } else if (y - lastY > THRESHOLD) {
+        // Never hide while keyboard focus is inside the nav.
+        if (!headerRef.current?.contains(document.activeElement)) setHidden(true);
+      } else if (lastY - y > THRESHOLD) {
+        setHidden(false);
+      } else {
+        return; // small movement: keep accumulating from the same anchor
+      }
+      lastY = y;
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
+
   // The sheet does not exist on desktop, so leave the open state behind when the viewport grows.
   useEffect(() => {
     if (isDesktop) setOpen(false);
@@ -109,7 +142,13 @@ export function Nav() {
   };
 
   return (
-    <header ref={headerRef} data-site-nav className={styles.header}>
+    <header
+      ref={headerRef}
+      data-site-nav
+      data-hidden={hidden && !open ? "" : undefined}
+      className={styles.header}
+      onFocus={() => setHidden(false)}
+    >
       <nav aria-label="Primary" className={styles.nav}>
         <div className={`glass ${styles.bar}`}>
           <a
