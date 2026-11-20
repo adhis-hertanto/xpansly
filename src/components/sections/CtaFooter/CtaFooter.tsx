@@ -89,12 +89,3 @@ export function SiteFooter() {
   );
 }
 
-/** Temporary alias for the old single export (renders both inside <main>). Drop once page.tsx uses the two components. */
-export function CtaFooter() {
-  return (
-    <>
-      <CtaSection />
-      <SiteFooter />
-    </>
-  );
-}

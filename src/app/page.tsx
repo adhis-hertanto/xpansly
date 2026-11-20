@@ -5,7 +5,7 @@ import { HowItWorks } from "@/components/sections/HowItWorks/HowItWorks";
 import { MeetMira } from "@/components/sections/MeetMira/MeetMira";
 import { Outcome } from "@/components/sections/Outcome/Outcome";
 import { WhoItsFor } from "@/components/sections/WhoItsFor/WhoItsFor";
-import { CtaFooter } from "@/components/sections/CtaFooter/CtaFooter";
+import { CtaSection, SiteFooter } from "@/components/sections/CtaFooter/CtaFooter";
 
 export default function Home() {
   return (
@@ -18,8 +18,9 @@ export default function Home() {
         <MeetMira />
         <Outcome />
         <WhoItsFor />
-        <CtaFooter />
+        <CtaSection />
       </main>
+      <SiteFooter />
     </>
   );
 }
