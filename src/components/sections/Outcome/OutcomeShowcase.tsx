@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getLenis } from "@/lib/scroll";
 import { bp, prefersReducedMotion, useMediaQuery } from "@/lib/motion";
 import styles from "./Outcome.module.css";
+import { ASSETS } from "@/lib/paths";
 
 const steps = [
   {
@@ -32,7 +33,7 @@ const steps = [
 const SIZES = "(min-width: 768px) 632px, calc(100vw - 40px)";
 
 function PanelImage({ index, alt, lazy = true }: { index: number; alt: string; lazy?: boolean }) {
-  const base = `/assets/outcome/outcome-panel-${index + 1}`;
+  const base = `${ASSETS}/outcome/outcome-panel-${index + 1}`;
   return (
     <picture>
       <source type="image/avif" srcSet={`${base}-630.avif 630w, ${base}-1260.avif 1260w`} sizes={SIZES} />

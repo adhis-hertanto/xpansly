@@ -6,6 +6,7 @@ import { sectionIds } from "@/config/site";
 import { bp, useMediaQuery } from "@/lib/motion";
 import { getLenis, scrollToId } from "@/lib/scroll";
 import styles from "./Nav.module.css";
+import { ASSETS } from "@/lib/paths";
 
 /** Figma 850:143-145 (copy verbatim). Targets are in-page sections. */
 const links = [
@@ -127,7 +128,7 @@ export function Nav() {
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/brand/xpansly-logo.svg" alt="" width={133} height={40} />
+            <img src={`${ASSETS}/brand/xpansly-logo.svg`} alt="" width={133} height={40} />
           </a>
 
           <ul className={styles.links}>

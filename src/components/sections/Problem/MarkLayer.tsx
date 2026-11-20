@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { Component, useEffect, useRef, useState, type CSSProperties, type MutableRefObject, type ReactNode } from "react";
 import { MARK_MATERIAL } from "./three/config";
 import styles from "./Problem.module.css";
+import { ASSETS } from "@/lib/paths";
 
 // The whole three/r3f/postprocessing bundle lives in this chunk, never in the initial page JS.
 const Scene = dynamic(() => import("./three/Scene"), { ssr: false });
@@ -122,17 +123,17 @@ export function MarkLayer({ progress, reduced }: { progress: MutableRefObject<nu
             <picture>
               <source
                 type="image/avif"
-                srcSet="/assets/problem/mark-poster-1200.avif 1200w, /assets/problem/mark-poster-2000.avif 2000w"
+                srcSet={`${ASSETS}/problem/mark-poster-1200.avif 1200w, ${ASSETS}/problem/mark-poster-2000.avif 2000w`}
                 sizes="min(100vh, 110vw)"
               />
               <source
                 type="image/webp"
-                srcSet="/assets/problem/mark-poster-1200.webp 1200w, /assets/problem/mark-poster-2000.webp 2000w"
+                srcSet={`${ASSETS}/problem/mark-poster-1200.webp 1200w, ${ASSETS}/problem/mark-poster-2000.webp 2000w`}
                 sizes="min(100vh, 110vw)"
               />
               <img
                 className={styles.posterImg}
-                src="/assets/problem/mark-poster-1200.webp"
+                src={`${ASSETS}/problem/mark-poster-1200.webp`}
                 width={1200}
                 height={1190}
                 alt=""

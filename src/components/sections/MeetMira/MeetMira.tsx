@@ -1,12 +1,13 @@
 import { Section } from "@/components/ui";
 import { sectionIds } from "@/config/site";
 import styles from "./MeetMira.module.css";
+import { ASSETS } from "@/lib/paths";
 
 const photoWidths = [640, 1024] as const;
 const kpiWidths = [412, 684] as const;
 
 const set = (base: string, widths: readonly number[], ext: "avif" | "webp") =>
-  widths.map((w) => `/assets/mira/${base}-${w}.${ext} ${w}w`).join(", ");
+  widths.map((w) => `${ASSETS}/mira/${base}-${w}.${ext} ${w}w`).join(", ");
 
 /** Meet Mira (Figma 849:150): photo panel with KPI card on the left, green copy panel on the right. */
 export function MeetMira() {
@@ -18,7 +19,7 @@ export function MeetMira() {
             <source type="image/avif" srcSet={set("mira-photo", photoWidths, "avif")} sizes="(min-width: 1200px) 592px, 100vw" />
             <source type="image/webp" srcSet={set("mira-photo", photoWidths, "webp")} sizes="(min-width: 1200px) 592px, 100vw" />
             <img
-              src="/assets/mira/mira-photo-1024.webp"
+              src={`${ASSETS}/mira/mira-photo-1024.webp`}
               alt=""
               width={1024}
               height={1024}
@@ -31,7 +32,7 @@ export function MeetMira() {
             <source type="image/avif" srcSet={set("mira-kpi", kpiWidths, "avif")} sizes="(min-width: 768px) 412px, 80vw" />
             <source type="image/webp" srcSet={set("mira-kpi", kpiWidths, "webp")} sizes="(min-width: 768px) 412px, 80vw" />
             <img
-              src="/assets/mira/mira-kpi-684.webp"
+              src={`${ASSETS}/mira/mira-kpi-684.webp`}
               alt="Dashboard card showing new users, unique users, week 1 retention and session length against the previous 28 days"
               width={412}
               height={205}

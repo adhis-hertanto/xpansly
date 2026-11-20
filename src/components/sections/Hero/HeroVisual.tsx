@@ -1,6 +1,7 @@
 import styles from "./HeroVisual.module.css";
+import { ASSETS } from "@/lib/paths";
 
-const base = "/assets/hero";
+const base = `${ASSETS}/hero`;
 
 type CardProps = {
   name: string;

@@ -2,6 +2,7 @@ import { Chip, Section } from "@/components/ui";
 import { sectionIds } from "@/config/site";
 import { EarlyAccessForm } from "./EarlyAccessForm";
 import styles from "./CtaFooter.module.css";
+import { ASSETS, basePath } from "@/lib/paths";
 
 /**
  * Be first in. + footer (Figma 848:24337).
@@ -11,7 +12,7 @@ import styles from "./CtaFooter.module.css";
  * margin and is transparent), so the two read as one 1083-high frame with no gap.
  */
 
-const BG = "/assets/cta/cta-bg";
+const BG = `${ASSETS}/cta/cta-bg`;
 
 export function CtaSection() {
   return (
@@ -70,7 +71,7 @@ export function SiteFooter() {
       {/* Not in Figma (848:24337 has no footer logo); added on request. Remove this img to match Figma exactly. */}
       {/* eslint-disable-next-line @next/next/no-img-element -- static export, small SVG: next/image adds nothing */}
       <img
-        src="/assets/brand/xpansly-logo.svg"
+        src={`${ASSETS}/brand/xpansly-logo.svg`}
         width={133}
         height={40}
         alt="Xpansly"
@@ -81,7 +82,7 @@ export function SiteFooter() {
       <p className={`t-label-sm ${styles.legal}`}>
         © 2026 Xpansly · GDPR-native · Built in the UK ·{" "}
         {/* TODO(privacy): /privacy does not exist yet; build the page or update this href. */}
-        <a href="/privacy" className={styles.link}>
+        <a href={`${basePath}/privacy`} className={styles.link}>
           Privacy Policy
         </a>
       </p>

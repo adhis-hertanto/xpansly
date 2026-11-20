@@ -3,8 +3,9 @@ import { sectionIds } from "@/config/site";
 import { HeroForm } from "./HeroForm";
 import { HeroVisual } from "./HeroVisual";
 import styles from "./Hero.module.css";
+import { ASSETS } from "@/lib/paths";
 
-const bg = "/assets/hero/hero-bg";
+const bg = `${ASSETS}/hero/hero-bg`;
 
 /**
  * Hero (Figma 849:147 + background 848:16504 / scrim 848:16501).

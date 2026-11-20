@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import styles from "./HowItWorks.module.css";
+import { ASSETS } from "@/lib/paths";
 
 export type HowItWorksCardProps = {
   title: ReactNode;
@@ -14,7 +15,7 @@ const STAGE_HEIGHT = 400;
 const widths = [600, 1148] as const;
 
 const srcSet = (image: string, ext: "avif" | "webp") =>
-  widths.map((w) => `/assets/how-it-works/${image}-${w}.${ext} ${w}w`).join(", ");
+  widths.map((w) => `${ASSETS}/how-it-works/${image}-${w}.${ext} ${w}w`).join(", ");
 
 /** One feature card: copy block, divider, then the mockup stage (flattened Figma raster). */
 export function HowItWorksCard({ title, body, image, alt }: HowItWorksCardProps) {
@@ -30,7 +31,7 @@ export function HowItWorksCard({ title, body, image, alt }: HowItWorksCardProps)
           <source type="image/avif" srcSet={srcSet(image, "avif")} sizes="(min-width: 1200px) 574px, (min-width: 768px) 44vw, 90vw" />
           <source type="image/webp" srcSet={srcSet(image, "webp")} sizes="(min-width: 1200px) 574px, (min-width: 768px) 44vw, 90vw" />
           <img
-            src={`/assets/how-it-works/${image}-1148.webp`}
+            src={`${ASSETS}/how-it-works/${image}-1148.webp`}
             alt={alt}
             width={STAGE_WIDTH}
             height={STAGE_HEIGHT}

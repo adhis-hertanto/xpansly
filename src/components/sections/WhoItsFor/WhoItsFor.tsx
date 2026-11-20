@@ -2,10 +2,11 @@ import { Section } from "@/components/ui";
 import { sectionIds } from "@/config/site";
 import { AudienceCard } from "./AudienceCard";
 import styles from "./WhoItsFor.module.css";
+import { ASSETS } from "@/lib/paths";
 
 /** Who it's for (Figma 849:152, hover states 863:140). */
 
-const BASE = "/assets/who-its-for";
+const BASE = `${ASSETS}/who-its-for`;
 
 const audiences = [
   {
