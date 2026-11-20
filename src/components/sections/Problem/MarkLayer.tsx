@@ -77,9 +77,23 @@ export function MarkLayer({ progress, reduced }: { progress: MutableRefObject<nu
   // ~12% of the track and cubes start at 25%, so the chunk has the scroll distance to arrive).
   const visible = useInView(root, "0px", active);
   const [near, setNear] = useState(false);
+  // Defer the 3D chunk until the user has interacted (scroll, pointer, key, touch). At first paint the
+  // stage can touch the fold on tall screens; loading ~1 MB of WebGL code there would block the main
+  // thread during page load. Cubes only appear from 25% into the section, so there is runway.
+  const [interacted, setInteracted] = useState(false);
   useEffect(() => {
-    if (visible) setNear(true);
-  }, [visible]);
+    if (window.scrollY > 0) {
+      setInteracted(true);
+      return;
+    }
+    const events = ["scroll", "wheel", "pointerdown", "keydown", "touchstart"] as const;
+    const on = () => setInteracted(true);
+    events.forEach((e) => window.addEventListener(e, on, { once: true, passive: true }));
+    return () => events.forEach((e) => window.removeEventListener(e, on));
+  }, []);
+  useEffect(() => {
+    if (visible && interacted) setNear(true);
+  }, [visible, interacted]);
 
   useEffect(() => {
     if (reduced) return;

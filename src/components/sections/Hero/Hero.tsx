@@ -14,7 +14,8 @@ const bg = "/assets/hero/hero-bg";
 export function Hero() {
   const set = (ext: string) =>
     [828, 1440, 2880].map((w) => `${bg}-${w}.${ext} ${w}w`).join(", ");
-  const sizes = "(min-width: 1200px) 100vw, (min-width: 768px) 2000px, 1400px";
+  // Below 768 the art sits under a 62% dark overlay, so the 1440 file is plenty even at 3x DPR.
+  const sizes = "(min-width: 1200px) 100vw, (min-width: 768px) 1458px, 540px";
 
   return (
     <Section id={sectionIds.hero} labelledBy="hero-title" contained={false} className={styles.hero}>
@@ -29,7 +30,7 @@ export function Hero() {
             height={1778}
             fetchPriority="high"
             loading="eager"
-            decoding="async"
+            decoding="auto"
             className={styles.bgImg}
           />
         </picture>

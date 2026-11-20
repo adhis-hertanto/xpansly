@@ -1,7 +1,27 @@
 import localFont from "next/font/local";
 
-export { GeistSans } from "geist/font/sans";
-export { GeistMono } from "geist/font/mono";
+/**
+ * Geist and Geist Mono (Vercel, SIL OFL, see public/fonts/geist/OFL.txt). The page only uses
+ * Regular (400), so we ship static Regular files subset to Latin (~17 KB and ~14 KB) instead of
+ * the full variable fonts from the `geist` package (~70 KB each).
+ */
+export const GeistSans = localFont({
+  src: [{ path: "../../public/fonts/geist/Geist-Regular.woff2", weight: "400", style: "normal" }],
+  variable: "--font-geist-sans",
+  display: "swap",
+  preload: true,
+  fallback: ["system-ui", "-apple-system", "Segoe UI", "Arial", "sans-serif"],
+  adjustFontFallback: "Arial",
+});
+
+export const GeistMono = localFont({
+  src: [{ path: "../../public/fonts/geist/GeistMono-Regular.woff2", weight: "400", style: "normal" }],
+  variable: "--font-geist-mono",
+  display: "swap",
+  preload: true,
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+  adjustFontFallback: false,
+});
 
 /**
  * Recia (Indian Type Foundry, Fontshare licence). Only Medium is used on the page

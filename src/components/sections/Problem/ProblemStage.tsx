@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "@/lib/motion";
 import { MarkLayer } from "./MarkLayer";
 import styles from "./Problem.module.css";
 
-gsap.registerPlugin(ScrollTrigger);
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const smooth = (a: number, b: number, x: number) => {
@@ -91,17 +88,27 @@ export function ProblemStage({ children }: { children: ReactNode }) {
       set("--ty", ty / 2, 1);
     }
 
-    const st = ScrollTrigger.create({
-      trigger: section,
-      start: "top top",
-      end: "bottom bottom",
-      onUpdate: (self) => apply(self.progress),
-      onRefresh: (self) => apply(self.progress),
+    apply(0);
+    // GSAP is loaded on demand so it is not part of the initial page JS.
+    let st: { kill: () => void } | null = null;
+    let cancelled = false;
+    void Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
+      if (cancelled) return;
+      gsap.registerPlugin(ScrollTrigger);
+      const trigger = ScrollTrigger.create({
+        trigger: section,
+        start: "top top",
+        end: "bottom bottom",
+        onUpdate: (self) => apply(self.progress),
+        onRefresh: (self) => apply(self.progress),
+      });
+      apply(trigger.progress);
+      st = trigger;
     });
-    apply(st.progress);
 
     return () => {
-      st.kill();
+      cancelled = true;
+      st?.kill();
       ro.disconnect();
       // Reduced motion can flip on after hydration: drop inline state so the CSS fallback applies.
       Object.keys(cache).forEach((k) => stage.style.removeProperty(k));
