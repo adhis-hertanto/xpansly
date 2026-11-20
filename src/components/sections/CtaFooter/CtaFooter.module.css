@@ -1,0 +1,140 @@
+.section {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  background: var(--black);
+}
+
+.picture {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  display: block;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Figma 848:24335: #0A0A0A 100% at 0, 60% at 19.231%, 0% at 47.596%, top to bottom. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to bottom,
+    rgb(10 10 10 / 1) 0%,
+    rgb(10 10 10 / 0.6) 19.231%,
+    rgb(10 10 10 / 0) 47.596%
+  );
+  pointer-events: none;
+}
+
+.cta {
+  padding-block: calc(96 * var(--u)) calc(96 * var(--u));
+}
+
+.content {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: calc(40 * var(--u));
+  min-width: 0;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(16 * var(--u));
+  text-align: center;
+}
+
+.title {
+  color: var(--white);
+}
+
+.lede {
+  max-width: calc(568 * var(--u));
+  color: var(--neutral-300);
+  text-wrap: balance;
+}
+
+.formGlass {
+  width: 100%;
+}
+
+.formCard {
+  padding: calc(24 * var(--u));
+  background: var(--neutral-900);
+  border: 1px solid var(--neutral-800);
+  border-radius: calc(12 * var(--u));
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  border-top: 1px solid var(--neutral-800);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(16 * var(--u));
+  padding: calc(24 * var(--u)) var(--margin);
+  text-align: center;
+}
+
+.logo {
+  width: calc(100 * var(--u));
+  min-width: 80px;
+  height: auto;
+}
+
+.legal {
+  color: var(--neutral-400);
+}
+
+.link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: transparent;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    text-decoration-color var(--dur-fast) var(--ease-out);
+}
+
+.link:hover {
+  color: var(--white);
+  text-decoration-color: currentColor;
+}
+
+@media (min-width: 768px) {
+  .cta {
+    padding-block: calc(140 * var(--u)) calc(120 * var(--u));
+  }
+
+  .content {
+    grid-column: 2 / 8;
+    gap: calc(48 * var(--u));
+  }
+
+  .formCard {
+    padding: calc(32 * var(--u));
+  }
+
+  .footer {
+    padding-block: calc(32 * var(--u));
+  }
+}
+
+@media (min-width: 1200px) {
+  .cta {
+    padding-block: calc(184 * var(--u)) calc(160 * var(--u));
+  }
+
+  .content {
+    grid-column: 4 / 10;
+  }
+}

@@ -1,0 +1,268 @@
+.section {
+  background: var(--black);
+  padding-block: calc(96 * var(--u));
+}
+
+.header {
+  margin-bottom: calc(40 * var(--u));
+}
+
+.title {
+  color: var(--white);
+}
+
+.br {
+  display: none;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: calc(32 * var(--u));
+}
+
+/* ---------- Cards: stacked by default (mobile, tablet, touch). Body copy always visible. ---------- */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16 * var(--u));
+}
+
+.card {
+  --x: 1; /* 1 = body copy shown (stacked layouts); desktop hover layouts drive it per card */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+  min-height: calc(480 * var(--u));
+  padding: calc(8 * var(--u));
+  background: var(--neutral-900);
+  border: 1px solid var(--neutral-800);
+  border-radius: calc(16 * var(--u));
+  overflow: hidden;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* Single image element, container animates; image bleeds 1px over the border. */
+.picture {
+  position: absolute;
+  inset: -1px;
+  display: block;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.panel {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  padding: calc(24 * var(--u));
+  background: var(--neutral-950);
+  border: 1px solid var(--neutral-800);
+  border-radius: calc(12 * var(--u));
+  overflow: clip;
+}
+
+.label {
+  margin-bottom: calc((12 + 4 * var(--x)) * var(--u));
+  color: var(--neutral-400);
+}
+
+.bodyWrap {
+  padding-top: calc(16 * var(--x) * var(--u));
+}
+
+.cardTitle {
+  text-wrap: wrap;
+  color: var(--white);
+}
+
+.copy {
+  color: var(--neutral-300);
+}
+
+/* ---------- Notes ---------- */
+.notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(12 * var(--u)) calc(32 * var(--u));
+  padding: 0;
+  list-style: none;
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  gap: calc(8 * var(--u));
+  color: var(--neutral-400);
+}
+
+.dot {
+  flex: none;
+  width: calc(8 * var(--u));
+  height: calc(8 * var(--u));
+  min-width: 6px;
+  min-height: 6px;
+  background: var(--purple-300);
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding-block: calc(120 * var(--u));
+  }
+
+  .header {
+    margin-bottom: calc(48 * var(--u));
+  }
+
+  .br {
+    display: inline;
+  }
+
+  .body {
+    gap: calc(40 * var(--u));
+  }
+
+  .card {
+    min-height: calc(520 * var(--u));
+  }
+
+  .panel {
+    width: min(100%, calc(560 * var(--u)));
+  }
+}
+
+@media (min-width: 1200px) {
+  .section {
+    padding-block: calc(160 * var(--u));
+  }
+
+  .header {
+    margin-bottom: calc(64 * var(--u));
+  }
+
+  .card {
+    min-height: calc(560 * var(--u));
+  }
+
+  .panel {
+    width: 100%;
+  }
+}
+
+/* ---------- Desktop with a fine hover pointer: two-up, hover / keyboard focus expands a card ----------
+   Hover or keyboard focus (:focus-visible; the card is the only focus target, so this equals focus-within
+   without leaving a card stuck open after a mouse click). Pure CSS: --cols drives the grid; --x (open) and
+   --c (collapsed) are 0/1 per card and drive opacity, panel width and the body reveal. Hover rules come after
+   the focus rules so the hovered card wins when focus and pointer are on different cards. */
+@media (min-width: 1200px) and (hover: hover) and (pointer: fine) {
+  .cards {
+    --cols: minmax(0, 1fr) minmax(0, 1fr);
+    --x1: 0;
+    --x2: 0;
+    --c1: 0;
+    --c2: 0;
+
+    display: grid;
+    grid-template-columns: var(--cols);
+    transition: grid-template-columns var(--dur-slow) var(--ease-in-out);
+  }
+
+  .card {
+    transition: opacity var(--dur-slow) var(--ease-in-out);
+  }
+
+  .cardFirst {
+    --x: var(--x1);
+    --c: var(--c1);
+  }
+
+  .cardSecond {
+    --x: var(--x2);
+    --c: var(--c2);
+  }
+
+  .card {
+    opacity: calc(1 - 0.6 * var(--c));
+  }
+
+  .panel {
+    width: calc(100% - var(--x) * (100% - 440 * var(--u)));
+    opacity: calc(1 - var(--c));
+    transition:
+      width var(--dur-slow) var(--ease-in-out),
+      opacity var(--dur-slow) var(--ease-in-out);
+  }
+
+  .label {
+    transition: margin-bottom var(--dur-slow) var(--ease-in-out);
+  }
+
+  .bodyWrap {
+    display: block;
+    max-height: calc(var(--x) * 140 * var(--u));
+    opacity: var(--x);
+    overflow: hidden;
+    transition:
+      padding-top var(--dur-slow) var(--ease-in-out),
+      max-height var(--dur-slow) var(--ease-in-out),
+      opacity var(--dur-slow) var(--ease-in-out);
+  }
+
+  .cards:has(.cardFirst:focus-visible) {
+    --cols: minmax(0, 1064fr) minmax(0, 200fr);
+    --x1: 1;
+    --x2: 0;
+    --c1: 0;
+    --c2: 1;
+  }
+
+  .cards:has(.cardSecond:focus-visible) {
+    --cols: minmax(0, 200fr) minmax(0, 1064fr);
+    --x1: 0;
+    --x2: 1;
+    --c1: 1;
+    --c2: 0;
+  }
+
+  .cards:has(.cardFirst:hover) {
+    --cols: minmax(0, 1064fr) minmax(0, 200fr);
+    --x1: 1;
+    --x2: 0;
+    --c1: 0;
+    --c2: 1;
+  }
+
+  .cards:has(.cardSecond:hover) {
+    --cols: minmax(0, 200fr) minmax(0, 1064fr);
+    --x1: 0;
+    --x2: 1;
+    --c1: 1;
+    --c2: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cards,
+  .card,
+  .panel,
+  .bodyWrap,
+  .label {
+    transition: none !important;
+  }
+}

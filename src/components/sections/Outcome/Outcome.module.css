@@ -1,0 +1,235 @@
+.section {
+  padding-block: calc(96 * var(--u)) calc(96 * var(--u));
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(24 * var(--u));
+  margin-bottom: calc(48 * var(--u));
+  text-align: center;
+}
+
+.title {
+  color: var(--white);
+  max-width: calc(720 * var(--u));
+}
+
+.lede {
+  color: var(--neutral-300);
+  max-width: calc(632 * var(--u));
+}
+
+/* ---------- Columns (mobile first: one column, each step carries its own panel) ---------- */
+.columns {
+  row-gap: 0;
+}
+
+.left {
+  display: none;
+}
+
+.right {
+  grid-column: 1 / -1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(56 * var(--u));
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: calc(24 * var(--u));
+  border-top: 1px solid var(--neutral-800);
+  padding-top: calc(32 * var(--u));
+}
+
+.inlinePanel {
+  width: 100%;
+  max-width: calc(632 * var(--u));
+  aspect-ratio: 632 / 540;
+  position: relative;
+  overflow: hidden;
+  background: var(--neutral-900);
+  border: 1px solid var(--neutral-800);
+  border-radius: calc(12 * var(--u));
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: calc(16 * var(--u));
+}
+
+.num,
+.itemTitle,
+.itemBody {
+  margin: 0;
+}
+
+/* Below 1200 every step is shown in its active styling. */
+.num {
+  color: var(--purple-300);
+}
+.itemTitle {
+  color: var(--white);
+}
+.itemBody {
+  color: var(--neutral-300);
+}
+
+/* ---------- Tablet ---------- */
+@media (min-width: 768px) {
+  .section {
+    padding-block: calc(120 * var(--u)) calc(160 * var(--u));
+  }
+  .header {
+    gap: calc(32 * var(--u));
+    margin-bottom: calc(64 * var(--u));
+  }
+  .right {
+    gap: calc(80 * var(--u));
+  }
+  .item {
+    gap: calc(32 * var(--u));
+    padding-top: calc(48 * var(--u));
+  }
+  .content {
+    max-width: calc(632 * var(--u));
+  }
+}
+
+/* ---------- Desktop: sticky panel + scrolling steps ---------- */
+@media (min-width: 1200px) {
+  .section {
+    padding-block: calc(160 * var(--u)) calc(288 * var(--u));
+  }
+
+  .left {
+    display: block;
+    grid-column: 1 / span 6;
+    /* Let the sticky track run past the last (shorter) step so the panel stays put
+       while step 03 is at the viewport centre. The negative margin keeps the row height. */
+    margin-bottom: calc(-230 * var(--u));
+  }
+
+  /* Centre the 594-high block (panel 540 + 20 + tabs 34) in the viewport. */
+  .sticky {
+    position: sticky;
+    top: max(var(--nav-h), calc((100svh - 594 * var(--u)) / 2));
+    display: flex;
+    flex-direction: column;
+    gap: calc(20 * var(--u));
+  }
+
+  .panel {
+    display: grid;
+    width: 100%;
+    aspect-ratio: 632 / 540;
+    overflow: hidden;
+    background: var(--neutral-900);
+    border: 1px solid var(--neutral-800);
+    border-radius: calc(12 * var(--u));
+  }
+
+  /* All three layers share one grid cell: no layout shift, pure opacity crossfade. */
+  .layer {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transition: opacity var(--dur-med) var(--ease-in-out);
+  }
+  .layer[data-active] {
+    opacity: 1;
+  }
+
+  .tabs {
+    display: flex;
+    gap: calc(16 * var(--u));
+  }
+
+  .tab {
+    flex: 1 1 0;
+    min-width: 0;
+    appearance: none;
+    background: none;
+    border: 0;
+    border-top: 2px solid var(--neutral-700);
+    padding: calc(12 * var(--u)) 0 0;
+    margin: 0;
+    text-align: left;
+    white-space: nowrap;
+    color: var(--neutral-400);
+    cursor: pointer;
+    transition:
+      color var(--dur-med) var(--ease-out),
+      border-color var(--dur-med) var(--ease-out);
+  }
+  .tab:hover {
+    color: var(--neutral-300);
+  }
+  .tab[data-active] {
+    color: var(--white);
+    border-top-color: var(--white);
+  }
+
+  .right {
+    grid-column: 7 / -1;
+    padding-left: calc(48 * var(--u));
+    gap: 0;
+  }
+
+  .item {
+    height: calc(560 * var(--u));
+    padding-top: calc(208 * var(--u));
+    gap: 0;
+    overflow: clip;
+  }
+  .item:last-child {
+    height: auto;
+  }
+
+  .inlinePanel {
+    display: none;
+  }
+
+  .content {
+    max-width: none;
+  }
+
+  .num,
+  .itemTitle,
+  .itemBody {
+    color: var(--neutral-400);
+    transition: color var(--dur-med) var(--ease-out);
+  }
+  .item[data-active] .num {
+    color: var(--purple-300);
+  }
+  .item[data-active] .itemTitle {
+    color: var(--white);
+  }
+  .item[data-active] .itemBody {
+    color: var(--neutral-300);
+  }
+}
+
+@media (min-width: 1200px) and (prefers-reduced-motion: reduce) {
+  .layer,
+  .tab,
+  .num,
+  .itemTitle,
+  .itemBody {
+    transition: none;
+  }
+}
