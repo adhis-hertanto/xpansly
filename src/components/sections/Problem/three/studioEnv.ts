@@ -48,10 +48,10 @@ export function buildStudio() {
   panel(18, 3, 0.35, 0, -14, 4);
   // Side strip lights (rim on bevels), left white, right a faint cool tint.
   panel(2.2, 20, 4.5, -13, 0, 3);
-  panel(2.2, 20, 3.2, 13, 0, 3, "#e8e4ff");
+  panel(2.2, 20, 3.2, 13, 0, 3, "#f2efff");
   // Back strips so the mark has edge light when it sways.
   panel(3, 18, 2.5, -6, 2, -14);
-  panel(3, 18, 2.5, 7, 2, -14, "#d9b8ff");
+  panel(3, 18, 2.5, 7, 2, -14, "#efe4ff");
 
   return {
     scene,

@@ -43,12 +43,13 @@ const sm = (a: number, b: number, x: number) => {
 };
 const easeOut = (x: number) => 1 - Math.pow(1 - x, 3);
 
-function makeChrome() {
+function makeChrome(simple: boolean) {
   return new MeshPhysicalMaterial({
     color: new Color("#e9ebee"),
     metalness: 1,
-    roughness: 0.14,
-    clearcoat: 1,
+    roughness: simple ? 0.2 : 0.14,
+    // Clearcoat is a second specular lobe: skipped on the low quality path.
+    clearcoat: simple ? 0 : 1,
     clearcoatRoughness: 0.06,
   });
 }
@@ -102,7 +103,7 @@ export function CubeMark({ progress, material, quality, idle = 1, offset }: Cube
     const s = U * 1.0;
     return new RoundedBoxGeometry(s, s, s, quality === "high" ? 2 : 1, U * 0.13);
   }, [quality]);
-  const mat = useMemo(() => (material === "glass" ? makeGlass() : makeChrome()), [material]);
+  const mat = useMemo(() => (material === "glass" ? makeGlass() : makeChrome(quality === "low")), [material, quality]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   useEffect(() => {
     const m = mesh.current;

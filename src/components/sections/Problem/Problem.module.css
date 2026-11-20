@@ -1,0 +1,250 @@
+/* The problem: tall track + sticky stage. Everything is scaled with --u (1 = one Figma px). */
+
+.section {
+  position: relative;
+  background: #0a0a0a;
+  height: 450vh;
+  height: 450svh;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #0a0a0a;
+  /* Scroll driven state, written by ProblemStage (no React renders per frame). */
+  --h: 0; /* heading opacity */
+  --a0: 0; /* card arrival 0..1 */
+  --a1: 0;
+  --a2: 0;
+  --scrim: 0;
+  --ty: 0; /* content re-centring, px */
+  --pf: 0; /* poster visibility from scroll (fallbacks / placeholder) */
+}
+
+/* ---------- Layers ---------- */
+
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out, ease-out);
+}
+.canvasReady {
+  opacity: 1;
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: var(--pf);
+}
+.posterInner {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  opacity: var(--pn, 1);
+  /* Hold until the canvas has finished fading in over it. */
+  transition: opacity 0.4s ease 0.6s;
+}
+.posterImg {
+  display: block;
+  width: min(100vh * 1.0084, 100% * 1.106);
+  height: auto;
+  aspect-ratio: 1200 / 1190;
+  max-width: none;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--scrim);
+  background: radial-gradient(
+    ellipse farthest-side at 50% 50%,
+    rgb(10 10 10 / 0.75) 0%,
+    rgb(10 10 10 / 0.35) 45%,
+    rgb(10 10 10 / 0) 75%
+  );
+}
+
+/* ---------- Content ---------- */
+
+.content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(24 * var(--u));
+  padding-inline: var(--margin);
+  transform: translate3d(0, calc(var(--ty) * 1px), 0);
+  will-change: transform;
+}
+
+.heading {
+  max-width: calc(1064 * var(--u));
+  text-align: center;
+  color: var(--white, #fff);
+  opacity: var(--h);
+  /* Soft shadow keeps the white heading readable on bright chrome highlights. */
+  text-shadow: 0 0 calc(24 * var(--u)) rgb(10 10 10 / 0.7);
+}
+
+.br {
+  display: none;
+}
+
+.cards {
+  list-style: none;
+  padding: 0;
+  width: min(100%, calc(848 * var(--u)));
+  display: flex;
+  flex-direction: column;
+  gap: calc(10 * var(--u));
+}
+
+.card {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(16 * var(--u));
+  padding: calc(16 * var(--u));
+  border-radius: calc(12 * var(--u));
+  border: 1px solid rgb(255 255 255 / 0.16);
+  background: rgb(255 255 255 / 0.06);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  overflow: clip;
+  opacity: var(--a);
+  transform: translate3d(0, calc((1 - var(--a)) * 24 * var(--u)), 0);
+}
+.card:nth-child(1) {
+  --a: var(--a0);
+}
+.card:nth-child(2) {
+  --a: var(--a1);
+}
+.card:nth-child(3) {
+  --a: var(--a2);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card {
+    background: rgb(24 24 24 / 0.92);
+  }
+}
+
+.index {
+  flex: none;
+  padding-top: calc(4 * var(--u));
+  color: var(--white, #fff);
+}
+
+.text {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(8 * var(--u));
+}
+
+.title {
+  color: var(--white, #fff);
+}
+
+.body {
+  color: var(--neutral-300, #d4d4d4);
+}
+
+@media (min-width: 768px) {
+  .content {
+    gap: calc(32 * var(--u));
+  }
+  .cards {
+    gap: calc(12 * var(--u));
+  }
+  .card {
+    gap: calc(24 * var(--u));
+    padding: calc(24 * var(--u));
+  }
+  .text {
+    gap: calc(10 * var(--u));
+  }
+}
+
+@media (min-width: 1200px) {
+  .content {
+    gap: calc(48 * var(--u));
+  }
+  .br {
+    display: inline;
+  }
+  .cards {
+    gap: calc(16 * var(--u));
+  }
+  .card {
+    gap: calc(32 * var(--u));
+    padding: calc(32 * var(--u));
+  }
+  .text {
+    gap: calc(12 * var(--u));
+  }
+}
+
+/* ---------- Reduced motion: no pinning, no scrub, everything visible in flow ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .section {
+    height: auto;
+  }
+  .stage {
+    position: relative;
+    height: auto;
+    min-height: 0;
+    overflow: clip;
+    --h: 1;
+    --a0: 1;
+    --a1: 1;
+    --a2: 1;
+    --scrim: 1;
+    --pf: 1;
+    --ty: 0;
+    padding-block: calc(96 * var(--u));
+  }
+  .content {
+    position: relative;
+    inset: auto;
+    transform: none;
+    will-change: auto;
+  }
+  .poster .posterInner {
+    --pn: 1;
+    transition: none;
+  }
+  .posterImg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    aspect-ratio: auto;
+  }
+  .canvas {
+    display: none;
+  }
+}

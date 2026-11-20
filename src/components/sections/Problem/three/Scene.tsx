@@ -28,6 +28,8 @@ export interface SceneProps {
   /** Shift the mark by a fraction of the visible viewport, e.g. [0.2, 0] for right of centre. */
   offset?: readonly [number, number];
   className?: string;
+  /** Called if the WebGL context is lost (the page should fall back to the poster). */
+  onContextLost?: () => void;
 }
 
 const FOV = 40;
@@ -69,6 +71,15 @@ function Framing() {
   return null;
 }
 
+/** Dev only: counts rendered frames so tests can check the canvas really stops when paused. */
+function FrameCounter() {
+  useFrame(() => {
+    const w = window as unknown as { __cubeFrames?: number };
+    w.__cubeFrames = (w.__cubeFrames ?? 0) + 1;
+  });
+  return null;
+}
+
 function ReadyPing({ onReady }: { onReady?: () => void }) {
   const n = useRef(0);
   useFrame(() => {
@@ -87,6 +98,7 @@ export function Scene({
   idle = 1,
   offset,
   className,
+  onContextLost,
 }: SceneProps) {
   const high = quality === "high";
   const glass = material === "glass";
@@ -94,7 +106,13 @@ export function Scene({
     <Canvas
       key={quality}
       className={className}
-      dpr={[1, 2]}
+      dpr={high ? [1, 2] : [1, 1.5]}
+      onCreated={({ gl }) => {
+        gl.domElement.addEventListener("webglcontextlost", (e) => {
+          e.preventDefault();
+          onContextLost?.();
+        });
+      }}
       frameloop={paused ? "never" : "always"}
       camera={{ fov: FOV, near: 0.1, far: 100, position: [0, 0, 11] }}
       gl={{
@@ -112,7 +130,7 @@ export function Scene({
       <Studio intensity={glass ? 0.55 : 0.9} />
       {/* Key accent from the upper left, and a very subtle purple rim from behind right. */}
       <directionalLight position={[-4, 5, 6]} intensity={1.4} color="#ffffff" />
-      <pointLight position={[6, 2, -4]} intensity={30} distance={20} decay={1.5} color="#8c00f4" />
+      <pointLight position={[6, 2, -4]} intensity={4} distance={20} decay={1.5} color="#8c00f4" />
       <CubeMark progress={progress} material={material} quality={quality} idle={idle} offset={offset} />
       {high && (
         <EffectComposer multisampling={4} enableNormalPass={false}>
@@ -120,6 +138,7 @@ export function Scene({
                   </EffectComposer>
       )}
       <ReadyPing onReady={onReady} />
+      {process.env.NODE_ENV !== "production" && <FrameCounter />}
     </Canvas>
   );
 }
