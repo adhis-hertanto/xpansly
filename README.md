@@ -24,3 +24,10 @@ npm run lint
 
 ## Deploying
 Serve `./out` from any static host with brotli or gzip compression enabled.
+
+## Prototype on GitHub Pages
+Every push to `main` runs `.github/workflows/deploy-pages.yml`, which builds the site with
+`NEXT_PUBLIC_BASE_PATH=/xpansly` and commits the output (`index.html`, `_next/`, `assets/` ...)
+to the root of `main`, where GitHub Pages serves it: https://adhis-hertanto.github.io/xpansly/
+Those root files are generated: edit `src/` and `public/`, not them. Pull before pushing,
+since the workflow adds a commit after each push.

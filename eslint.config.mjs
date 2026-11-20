@@ -17,6 +17,10 @@ const eslintConfig = [
       ".next/**",
       "out/**",
       "build/**",
+      // Published static build at the repo root (see .github/workflows/deploy-pages.yml)
+      "_next/**",
+      "assets/**",
+      "404/**",
       "next-env.d.ts",
     ],
   },

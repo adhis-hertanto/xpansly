@@ -1,4 +1,9 @@
-name: Deploy to GitHub Pages
+name: Publish site to main (GitHub Pages)
+
+# GitHub Pages serves the root of `main` ("Deploy from a branch"). On every push to main this
+# workflow builds the static export and commits it to the repository root, so the prototype at
+# https://adhis-hertanto.github.io/xpansly/ updates without changing any Pages settings.
+# Pushes made with GITHUB_TOKEN do not trigger workflows, so the publish commit does not loop.
 
 on:
   push:
@@ -6,16 +11,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: publish-site
+  cancel-in-progress: false
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,23 +32,31 @@ jobs:
 
       - run: npm run build
         env:
-          # The repository site is served from https://<user>.github.io/xpansly/
           NEXT_PUBLIC_BASE_PATH: /xpansly
           NEXT_TELEMETRY_DISABLED: 1
 
-      # Next.js output has a _next folder; stop Pages from running Jekyll over it.
-      - run: touch out/.nojekyll
+      - name: Copy build output to the repository root
+        run: |
+          # Remove the previously published files (listed in .pages-manifest), then copy the new build.
+          if [ -f .pages-manifest ]; then
+            while IFS= read -r name; do
+              [ -n "$name" ] && rm -rf -- "./$name"
+            done < .pages-manifest
+          fi
+          (cd out && ls -A) > .pages-manifest
+          cp -a out/. .
+          # Serve files as-is (Jekyll would skip the _next folder).
+          touch .nojekyll
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: out
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to publish"
+            exit 0
+          fi
+          git commit -m "Publish site build for ${GITHUB_SHA::7}"
+          git pull --rebase origin main
+          git push origin HEAD:main
