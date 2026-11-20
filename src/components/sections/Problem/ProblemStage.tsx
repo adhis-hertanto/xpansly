@@ -112,6 +112,7 @@ export function ProblemStage({ children }: { children: ReactNode }) {
     <div ref={stageRef} className={styles.stage}>
       <MarkLayer progress={progress} reduced={reduced} />
       <div className={styles.scrim} aria-hidden="true" />
+      <div className={styles.scrimTop} aria-hidden="true" />
       {children}
     </div>
   );

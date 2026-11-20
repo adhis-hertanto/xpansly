@@ -82,6 +82,21 @@
   );
 }
 
+/* Once the cards are in, the heading sits near the top, under the mark's bright tail. */
+.scrimTop {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--a0);
+  background: linear-gradient(
+    to bottom,
+    rgb(10 10 10 / 0.85) 0%,
+    rgb(10 10 10 / 0.8) 26%,
+    rgb(10 10 10 / 0) 50%
+  );
+}
+
 /* ---------- Content ---------- */
 
 .content {
@@ -231,6 +246,9 @@
     --pf: 1;
     --ty: 0;
     padding-block: calc(96 * var(--u));
+  }
+  .scrimTop {
+    display: none;
   }
   .content {
     position: relative;
