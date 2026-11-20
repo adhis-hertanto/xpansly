@@ -106,7 +106,7 @@
   --glass-fill: rgb(255 255 255 / 0.06);
   --glass-border: rgb(255 255 255 / 0.16);
   --glass-blur: 8px; /* Figma background blur 16 = CSS blur(8px) */
-  --glass-filter: blur(var(--glass-blur)) saturate(140%);
+  --glass-filter: blur(var(--glass-blur)) saturate(120%);
   --glass-fallback: rgb(28 28 28 / 0.94);
   --glass-radius: calc(20 * var(--u));
   --glass-rim: calc(12 * var(--u));
@@ -128,6 +128,8 @@
   :root {
     --ref: 834;
     --margin-n: 40;
+    /* Cap tablet scaling so 1000-1199 does not render larger than desktop at 1280. */
+    --scale-max: 1.2;
     --cols: 8;
     --gutter-n: 16;
 
@@ -148,6 +150,7 @@
   :root {
     --ref: 1440;
     --margin-n: 80;
+    --scale-max: 1.5;
     --cols: 12;
     --gutter-n: 16;
 

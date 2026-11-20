@@ -31,8 +31,10 @@
 }
 
 .logo {
-  display: block;
+  display: flex;
+  align-items: center;
   flex: none;
+  min-height: var(--min-tap); /* 44px tap target (the lockup itself is 40px tall) */
   line-height: 0;
   border-radius: 4px;
 }

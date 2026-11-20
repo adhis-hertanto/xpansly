@@ -95,7 +95,10 @@
 }
 
 .caption {
+  display: flex;
+  align-items: center;
   align-self: flex-start;
+  min-height: calc(24 * var(--u)); /* Figma caption box is 24 tall around the 20px label */
   padding-left: calc(16 * var(--u));
   border-left: 1px solid var(--green-100);
   color: var(--green-100);

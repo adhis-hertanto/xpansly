@@ -109,6 +109,10 @@
   .content {
     max-width: calc(632 * var(--u));
   }
+  /* Panel uses the full content width on tablet; the text keeps a readable measure. */
+  .inlinePanel {
+    max-width: none;
+  }
 }
 
 /* ---------- Desktop: sticky panel + scrolling steps ---------- */
@@ -136,7 +140,8 @@
 
   .panel {
     display: grid;
-    width: 100%;
+    /* Shrink to fit short viewports so the sticky block (panel + tabs) is never clipped. */
+    width: min(100%, calc((100svh - var(--nav-h) - 54 * var(--u) - 2rem) * 632 / 540));
     aspect-ratio: 632 / 540;
     overflow: hidden;
     background: var(--neutral-900);

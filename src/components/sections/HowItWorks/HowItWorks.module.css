@@ -16,6 +16,13 @@
   display: inline;
 }
 
+/* Figma keeps a trailing space after "account." that takes part in centring (shifts line 1 by ~7px at 1440). */
+@media (min-width: 1200px) {
+  .line:first-child::after {
+    content: "\00a0";
+  }
+}
+
 .cards {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

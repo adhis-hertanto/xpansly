@@ -22,6 +22,13 @@
   display: block;
   width: 100%;
   height: auto;
+  /* The exported card art is opaque with dark corners: clip to the Figma inner radius (14). */
+  border-radius: calc(14 / 524 * 100cqw);
+}
+
+/* Next move card: outer surface radius 20 (Figma 848:21159) */
+.stage .next .img {
+  border-radius: calc(20 / 524 * 100cqw);
 }
 
 /* Mira message 858:141: 477 x 125 at (25, 0) */

@@ -12,7 +12,7 @@
   height: calc(8 * var(--u));
   min-width: 6px;
   min-height: 6px;
-  border-radius: 50%;
+  border-radius: 0; /* Figma renders an 8x8 square */
   background: var(--green-400);
   flex: none;
 }
