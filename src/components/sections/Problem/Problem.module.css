@@ -104,7 +104,9 @@
   color: var(--white, #fff);
   opacity: var(--h);
   /* Soft shadow keeps the white heading readable on bright chrome highlights. */
-  text-shadow: 0 0 calc(24 * var(--u)) rgb(10 10 10 / 0.7);
+  text-shadow:
+    0 0 calc(10 * var(--u)) rgb(10 10 10 / calc(0.85 * var(--scrim))),
+    0 0 calc(32 * var(--u)) rgb(10 10 10 / calc(0.85 * var(--scrim)));
 }
 
 .br {
@@ -127,7 +129,10 @@
   padding: calc(16 * var(--u));
   border-radius: calc(12 * var(--u));
   border: 1px solid rgb(255 255 255 / 0.16);
-  background: rgb(255 255 255 / 0.06);
+  /* Figma fill (white 6%) over a light dark tint: keeps 4.5:1 for the body copy over bright chrome. */
+  background:
+    linear-gradient(rgb(10 10 10 / 0.3), rgb(10 10 10 / 0.3)),
+    rgb(255 255 255 / 0.06);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   overflow: clip;

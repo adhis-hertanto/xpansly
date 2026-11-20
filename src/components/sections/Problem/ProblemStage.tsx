@@ -103,6 +103,8 @@ export function ProblemStage({ children }: { children: ReactNode }) {
     return () => {
       st.kill();
       ro.disconnect();
+      // Reduced motion can flip on after hydration: drop inline state so the CSS fallback applies.
+      Object.keys(cache).forEach((k) => stage.style.removeProperty(k));
     };
   }, [reduced]);
 

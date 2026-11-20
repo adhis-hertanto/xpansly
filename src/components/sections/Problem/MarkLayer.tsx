@@ -72,8 +72,14 @@ export function MarkLayer({ progress, reduced }: { progress: MutableRefObject<nu
   const [ready, setReady] = useState(false);
 
   const active = !reduced && !failed;
-  const near = useInView(root, "100% 0px 100% 0px", active);
+  // The section starts right below the hero fold, so a "100% ahead" margin would load the 3D chunk on
+  // first paint. Load once the stage first enters the viewport (the stage is black for the first
+  // ~12% of the track and cubes start at 25%, so the chunk has the scroll distance to arrive).
   const visible = useInView(root, "0px", active);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    if (visible) setNear(true);
+  }, [visible]);
 
   useEffect(() => {
     if (reduced) return;
