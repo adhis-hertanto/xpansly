@@ -8,7 +8,7 @@ const cards = [
   {
     n: "01",
     title: "The decision is shared",
-    body: "A B2B purchase involves a group of people, from the budget holder to the people who'll use it every day. Win one and lose the rest, and the deal stalls.",
+    body: "A B2B purchase involves a group of people, from the budget holder to the people who’ll use it every day. Win one and lose the rest, and the deal stalls.",
   },
   {
     n: "02",

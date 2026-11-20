@@ -28,6 +28,11 @@
   max-width: calc(var(--content-max));
   padding: calc(8 * var(--u)) calc(8 * var(--u)) calc(8 * var(--u)) calc(16 * var(--u));
   border-radius: calc(8 * var(--u));
+  /* Glass recipe plus a dark tint: the bar floats over bright photos and art, and the links
+     must keep 4.5:1 everywhere (audit). Figma shows plain 6% glass over a dark hero only. */
+  background: linear-gradient(rgb(10 10 10 / 0.72), rgb(10 10 10 / 0.72)), var(--glass-fill);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
 }
 
 .logo {

@@ -11,10 +11,13 @@ const Scene = dynamic(() => import("./three/Scene"), { ssr: false });
 type Quality = "high" | "low";
 
 function detectQuality(): Quality {
-  try {
-    const forced = new URLSearchParams(window.location.search).get("cubeq");
-    if (forced === "high" || forced === "low") return forced;
-  } catch {}
+  if (process.env.NODE_ENV !== "production") {
+    // Dev-only override for testing: ?cubeq=high|low
+    try {
+      const forced = new URLSearchParams(window.location.search).get("cubeq");
+      if (forced === "high" || forced === "low") return forced;
+    } catch {}
+  }
   const coarse = window.matchMedia("(pointer: coarse)").matches;
   const cores = navigator.hardwareConcurrency || 8;
   const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
@@ -95,14 +98,19 @@ export function MarkLayer({ progress, reduced }: { progress: MutableRefObject<nu
     if (visible && interacted) setNear(true);
   }, [visible, interacted]);
 
+  // Probe WebGL only when the scene is about to be needed (avoids a throwaway context at mount).
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || !near) return;
     if (!hasWebGL()) {
       setFailed(true);
       return;
     }
     setQuality(detectQuality());
-  }, [reduced]);
+  }, [reduced, near]);
+
+  // The poster is only fetched when it can be seen: reduced motion, WebGL failure, or as the
+  // placeholder while the 3D chunk loads. Before that the stage is black anyway.
+  const showPoster = reduced || failed || near;
 
   const showScene = active && quality !== null && near;
 
@@ -110,27 +118,29 @@ export function MarkLayer({ progress, reduced }: { progress: MutableRefObject<nu
     <div ref={root} className={styles.layer} aria-hidden="true">
       <div className={styles.poster}>
         <div className={styles.posterInner} style={{ "--pn": ready && !failed ? 0 : 1 } as CSSProperties}>
-          <picture>
-            <source
-              type="image/avif"
-              srcSet="/assets/problem/mark-poster-1200.avif 1200w, /assets/problem/mark-poster-2000.avif 2000w"
-              sizes="min(100vh, 110vw)"
-            />
-            <source
-              type="image/webp"
-              srcSet="/assets/problem/mark-poster-1200.webp 1200w, /assets/problem/mark-poster-2000.webp 2000w"
-              sizes="min(100vh, 110vw)"
-            />
-            <img
-              className={styles.posterImg}
-              src="/assets/problem/mark-poster-1200.webp"
-              width={1200}
-              height={1190}
-              alt=""
-              loading="lazy"
-              decoding="async"
-            />
-          </picture>
+          {showPoster ? (
+            <picture>
+              <source
+                type="image/avif"
+                srcSet="/assets/problem/mark-poster-1200.avif 1200w, /assets/problem/mark-poster-2000.avif 2000w"
+                sizes="min(100vh, 110vw)"
+              />
+              <source
+                type="image/webp"
+                srcSet="/assets/problem/mark-poster-1200.webp 1200w, /assets/problem/mark-poster-2000.webp 2000w"
+                sizes="min(100vh, 110vw)"
+              />
+              <img
+                className={styles.posterImg}
+                src="/assets/problem/mark-poster-1200.webp"
+                width={1200}
+                height={1190}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+          ) : null}
         </div>
       </div>
       {showScene && (

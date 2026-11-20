@@ -15,7 +15,7 @@ export function Hero() {
   const set = (ext: string) =>
     [828, 1440, 2880].map((w) => `${bg}-${w}.${ext} ${w}w`).join(", ");
   // Below 768 the art sits under a 62% dark overlay, so the 1440 file is plenty even at 3x DPR.
-  const sizes = "(min-width: 1200px) 100vw, (min-width: 768px) 1458px, 540px";
+  const sizes = "(min-width: 1200px) 100vw, (min-width: 768px) 1458px, 460px";
 
   return (
     <Section id={sectionIds.hero} labelledBy="hero-title" contained={false} className={styles.hero}>

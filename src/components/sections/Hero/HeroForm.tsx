@@ -38,7 +38,7 @@ export function HeroForm() {
     try {
       await submitEarlyAccess({ email: email.trim(), source: "hero" });
       setStatus("success");
-      setMessage("Thanks, you are on the list. We will email you when early access opens.");
+      setMessage("Thanks, you’re on the list. We’ll email you when early access opens.");
       form.reset();
     } catch (err) {
       setStatus("error");
@@ -76,7 +76,6 @@ export function HeroForm() {
         className={`t-caption ${styles.message} ${status === "error" ? styles.messageError : ""}`}
         role={status === "error" ? "alert" : "status"}
         aria-live={status === "error" ? "assertive" : "polite"}
-        hidden={!message}
       >
         {message}
       </p>

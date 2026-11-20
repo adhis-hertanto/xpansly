@@ -46,7 +46,7 @@ export function HeroVisual() {
     <div
       className={styles.stage}
       role="img"
-      aria-label="Xpansly preview: Mira's morning message, accounts in motion and a suggested next move for Northwind."
+      aria-label="Xpansly preview: Mira’s morning message, accounts in motion and a suggested next move for Northwind."
     >
       <Card name="mira-message" widths={[904, 1356]} w={452} h={100} share={0.91} className={styles.mira} eager />
       <Card name="accounts" widths={[952, 1428]} w={476} h={246} share={0.96} className={styles.accounts} />

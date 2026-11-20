@@ -54,7 +54,7 @@ export function MeetMira() {
           <div className={styles.bodyGroup}>
             <div className={`t-body-lg ${styles.body}`}>
               <p>
-                Mira knows your ideal customers, your buyers and your goals. When a signal comes in, she doesn&apos;t just log it. She
+                Mira knows your ideal customers, your buyers and your goals. When a signal comes in, she doesn’t just log it. She
                 works out what it means for that account and what should happen next, for every person involved.
               </p>
               <p>

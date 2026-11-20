@@ -11,7 +11,7 @@ import styles from "./Nav.module.css";
 const links = [
   { label: "How it works", id: sectionIds.howItWorks },
   { label: "Mira", id: sectionIds.mira },
-  { label: "Who it's for", id: sectionIds.whoItsFor },
+  { label: "Who it’s for", id: sectionIds.whoItsFor },
 ] as const;
 
 const FOCUSABLE = "a[href], button:not([disabled])";

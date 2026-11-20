@@ -88,8 +88,8 @@ export function SelectField({
 
 function FieldError({ id, error }: { id: string; error?: string | null }) {
   return (
-    <p id={id} className={`t-caption ${styles.error}`} role={error ? "alert" : undefined} hidden={!error}>
-      {error}
+    <p id={id} className={`t-caption ${styles.error}`} role="alert">
+      {error ?? ""}
     </p>
   );
 }

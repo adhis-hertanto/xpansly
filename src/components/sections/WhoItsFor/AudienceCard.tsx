@@ -20,7 +20,12 @@ export function AudienceCard({
 }) {
   const interactive = useMediaQuery(`${bp.desktop} and ${bp.hover}`);
   return (
-    <article className={className} aria-labelledby={titleId} tabIndex={interactive ? 0 : undefined}>
+    <article
+      className={className}
+      aria-labelledby={titleId}
+      tabIndex={interactive ? 0 : undefined}
+      role={interactive ? "group" : undefined}
+    >
       {children}
     </article>
   );

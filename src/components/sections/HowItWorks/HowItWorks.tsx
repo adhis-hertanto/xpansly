@@ -6,7 +6,7 @@ import styles from "./HowItWorks.module.css";
 const cards: HowItWorksCardProps[] = [
   {
     title: "Map the committee",
-    body: "Xpansly builds a live picture of each target account: who's involved in the decision, what they care about and how engaged they are.",
+    body: "Xpansly builds a live picture of each target account: who’s involved in the decision, what they care about and how engaged they are.",
     image: "map-the-committee",
     alt: "Xpansly buying committee view for Northwind showing four of six people engaged, with a note that Mira added IT Security",
   },

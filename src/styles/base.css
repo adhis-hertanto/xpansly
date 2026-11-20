@@ -87,6 +87,11 @@ p {
   outline-offset: 3px;
 }
 
+/* Skip link and in-page navigation move focus to <main> / sections (tabindex="-1"). */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
 ::selection {
   background: var(--purple-700);
   color: var(--white);

@@ -73,3 +73,8 @@
 .error {
   color: var(--red-200);
 }
+
+/* Kept mounted so the alert region exists before an error is written into it. */
+.error:empty {
+  display: none;
+}

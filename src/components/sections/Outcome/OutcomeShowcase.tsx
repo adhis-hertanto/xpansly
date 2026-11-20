@@ -114,7 +114,7 @@ export function OutcomeShowcase() {
       lenis.scrollTo(top, { onComplete: release });
     } else {
       window.scrollTo({ top, behavior: prefersReducedMotion() ? "auto" : "smooth" });
-      window.setTimeout(release, prefersReducedMotion() ? 50 : 900);
+      lock.current = window.setTimeout(release, prefersReducedMotion() ? 50 : 900);
     }
   };
 
