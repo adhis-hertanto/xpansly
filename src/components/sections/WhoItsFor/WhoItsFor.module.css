@@ -1,5 +1,4 @@
 .section {
-  background: var(--black);
   padding-block: calc(96 * var(--u));
 }
 

@@ -1,0 +1,52 @@
+/* Sections inside sit on a transparent background so the field shows through. */
+.wrap {
+  position: relative;
+  isolation: isolate;
+  background: var(--bg);
+}
+
+/* Spans the whole run. Top and bottom fades blend into the neighbouring sections. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 60svh, #000 calc(100% - 60svh), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 60svh, #000 calc(100% - 60svh), transparent 100%);
+}
+
+/* One viewport-sized stage that rides along with the scroll. */
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  /* Vignette: brightest towards the edges and corners, quiet behind centred copy. */
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, rgb(0 0 0 / 0.25) 0%, #000 100%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, rgb(0 0 0 / 0.25) 0%, #000 100%);
+}
+
+.glow,
+.sharp {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.glow {
+  filter: blur(7px);
+  opacity: 0.85;
+  transform: translateZ(0);
+}
+
+.sharp {
+  opacity: 0.16;
+}
+
+@media (max-width: 767px) {
+  .glow {
+    filter: blur(5px);
+  }
+}

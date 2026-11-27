@@ -5,6 +5,7 @@ import { HowItWorks } from "@/components/sections/HowItWorks/HowItWorks";
 import { MeetMira } from "@/components/sections/MeetMira/MeetMira";
 import { Outcome } from "@/components/sections/Outcome/Outcome";
 import { WhoItsFor } from "@/components/sections/WhoItsFor/WhoItsFor";
+import { DitherBackdrop } from "@/components/ui/DitherField/DitherField";
 import { CtaSection, SiteFooter } from "@/components/sections/CtaFooter/CtaFooter";
 
 export default function Home() {
@@ -14,10 +15,12 @@ export default function Home() {
       <main id="main" tabIndex={-1}>
         <Hero />
         <Problem />
-        <HowItWorks />
-        <MeetMira />
-        <Outcome />
-        <WhoItsFor />
+        <DitherBackdrop>
+          <HowItWorks />
+          <MeetMira />
+          <Outcome />
+          <WhoItsFor />
+        </DitherBackdrop>
         <CtaSection />
       </main>
       <SiteFooter />
