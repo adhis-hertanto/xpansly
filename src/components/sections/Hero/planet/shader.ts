@@ -10,9 +10,8 @@ import { glslColours, type Colourway } from "./palette";
  * from (BX, BY). The canvas reproduces object-fit: cover over a 2880 x 1778 image, so it lines
  * up with the static poster underneath.
  *
- * Live additions on top of the still: the light angle and glow breathe, a pulse travels along the
- * geometry lines, the pointer pulls the light and lifts nearby lines and pills, a click sends a
- * ripple, and the grain is re-seeded like film.
+ * Live additions on top of the still: the light swings round the horizon to follow the pointer
+ * and breathes gently when idle. The line art and grain stay fixed.
  */
 export const VERT = `#version 300 es
 in vec2 p;
@@ -146,10 +145,10 @@ void main(){
   float q;
   float cov = pulseLines(uv, pn / R, q) * (d <= 0.0 ? 1.0 : exp(-d / 0.0405));
   if (cov > 0.0) {
-    float llf = exp(-abs(d) / (0.08 + uGlow * 0.45)) * (0.35 + 0.65 * ang2);
-    float wave = q - (-1.15 + 2.5 * fract(uTime / 9.0));
-    float boost = 1.0 + 1.6 * exp(-(wave / 0.09) * (wave / 0.09)) + 2.2 * lift(uv);
-    float al = cov * 0.45 * (0.3 + 0.7 * llf) * boost;
+    // Lit by the resting light, not the live one, so the line art stays fixed while the light moves.
+    float b0 = (mod(degrees(atan(-p.y, p.x)) - uLineAng + 180.0, 360.0) - 180.0) / (SPREAD * 1.8);
+    float llf = exp(-abs(d) / 0.3275) * (0.35 + 0.65 * exp(-b0 * b0));
+    float al = cov * 0.45 * (0.3 + 0.7 * llf);
     float t = ss(0.38, 0.72, (col.r + col.g + col.b) / 3.0);
     al = min(1.0, al * (1.0 + 0.6 * t));
     col = mix(col, mix(vec3(1.0), LAD, t), al);

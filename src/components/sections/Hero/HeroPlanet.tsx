@@ -20,6 +20,7 @@ const IMG_W = 2880;
 const IMG_H = 1778;
 const SHAPE = { S: 0.7146, BX: 0.3764, BY: 0.0243, cx: 0.3, cy: 0.3 };
 const BASE_LIGHT = -35;
+const LIGHT_RANGE = 75; // degrees either side of the resting light the pointer can swing it
 const FRAME_MS = 1000 / 30;
 const MAX_PX = 2.4e6;
 
@@ -36,8 +37,7 @@ export function HeroPlanet() {
 
   useEffect(() => {
     const canvas = ref.current;
-    const section = canvas?.closest("section");
-    if (!canvas || !section) return;
+    if (!canvas) return;
     const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, powerPreference: "high-performance" });
     if (!gl) return;
 
@@ -76,7 +76,6 @@ export function HeroPlanet() {
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const desktop = window.matchMedia("(min-width: 1200px)");
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
 
     // Layout: CSS size of the canvas and the cover-fitted image box inside it.
     let cw = 0, ch = 0, scale = 1, imgL = 0, imgT = 0, imgW = 1;
@@ -103,14 +102,14 @@ export function HeroPlanet() {
 
     // Interaction state, eased each frame.
     const ptr = { x: 0, y: 0, tx: 0, ty: 0, amt: 0, target: 0 };
-    const rip = { x: 0, y: 0, t0: -100, str: 0 };
     let light = BASE_LIGHT;
+    let mouseActive = false;
     const t0 = performance.now();
 
     const draw = (now: number) => {
       const t = reduced ? 0 : (now - t0) / 1000;
-      if (!fine.matches && !reduced) {
-        // No hover on touch: a slow light drifts around the lit side of the rim instead.
+      if (!mouseActive && !reduced) {
+        // No mouse over the hero (touch, or idle): a slow light drifts around the lit side of the rim.
         const a = ((BASE_LIGHT + 180 + 28 * Math.sin(t * 0.17)) * Math.PI) / 180;
         const r = 0.52 + 0.04 * Math.sin(t * 0.29);
         [ptr.tx, ptr.ty] = [SHAPE.cx + r * Math.cos(a) * -1, SHAPE.cy + r * Math.sin(a)];
@@ -119,22 +118,22 @@ export function HeroPlanet() {
       ptr.x += (ptr.tx - ptr.x) * 0.12;
       ptr.y += (ptr.ty - ptr.y) * 0.12;
       ptr.amt += (ptr.target - ptr.amt) * 0.06;
-      // The light leans towards the pointer (within +-40 degrees) and breathes slowly.
+      // The light follows the pointer round the horizon (within LIGHT_RANGE) and breathes when idle.
       const pa = (Math.atan2(-(ptr.y - SHAPE.cy), ptr.x - SHAPE.cx) * 180) / Math.PI;
       const delta = ((((pa - BASE_LIGHT + 180) % 360) + 360) % 360) - 180;
-      const goal = BASE_LIGHT + 5 * Math.sin(t * 0.11) + Math.max(-40, Math.min(40, delta)) * 0.45 * ptr.amt;
+      const goal = BASE_LIGHT + 5 * Math.sin(t * 0.11) * (1 - ptr.amt) + Math.max(-LIGHT_RANGE, Math.min(LIGHT_RANGE, delta)) * ptr.amt;
       light += (goal - light) * 0.08;
 
       gl.uniform2f(U.res, canvas.width, canvas.height);
       gl.uniform1f(U.scale, scale);
       gl.uniform3f(U.img, imgL, imgT, imgW);
       gl.uniform1f(U.time, t);
-      gl.uniform1f(U.seed, reduced ? 7 : Math.floor(t * 12));
+      gl.uniform1f(U.seed, 7); // static grain
       gl.uniform1f(U.light, light);
-      gl.uniform1f(U.lineAng, BASE_LIGHT + (light - BASE_LIGHT) * 0.5);
-      gl.uniform1f(U.glow, 0.55 * (1 + 0.035 * (Math.sin(t * 0.23) - 1)) + 0.03 * ptr.amt);
-      gl.uniform3f(U.ptr, ptr.x, ptr.y, ptr.amt);
-      gl.uniform4f(U.rip, rip.x, rip.y, (now - rip.t0) / 1000, rip.str);
+      gl.uniform1f(U.lineAng, BASE_LIGHT); // line art stays put
+      gl.uniform1f(U.glow, 0.55 * (1 + 0.035 * (Math.sin(t * 0.23) - 1)));
+      gl.uniform3f(U.ptr, 0, 0, 0); // pill dither lift unused
+      gl.uniform4f(U.rip, 0, 0, 0, 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
@@ -165,20 +164,20 @@ export function HeroPlanet() {
       show();
     };
 
+    // Tracked on the window so the floating nav and cards over the hero do not break the hover.
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
       const r = canvas.getBoundingClientRect();
-      [ptr.tx, ptr.ty] = toShape(e.clientX - r.left, e.clientY - r.top);
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      if (x < 0 || y < 0 || x > r.width || y > r.height) return onLeave();
+      [ptr.tx, ptr.ty] = toShape(x, y);
       if (ptr.amt < 0.01) [ptr.x, ptr.y] = [ptr.tx, ptr.ty];
       ptr.target = 1;
+      mouseActive = true;
     };
-    const onLeave = () => (ptr.target = 0);
-    const onDown = (e: PointerEvent) => {
-      if ((e.target as Element).closest("a, button, input, select, textarea, label")) return;
-      const r = canvas.getBoundingClientRect();
-      [rip.x, rip.y] = toShape(e.clientX - r.left, e.clientY - r.top);
-      rip.t0 = performance.now();
-      rip.str = 1;
+    const onLeave = () => {
+      ptr.target = 0;
+      mouseActive = false;
     };
 
     let resizeTimer = 0;
@@ -202,9 +201,8 @@ export function HeroPlanet() {
     };
     canvas.addEventListener("webglcontextlost", onLost);
     if (!reduced) {
-      section.addEventListener("pointermove", onMove);
-      section.addEventListener("pointerleave", onLeave);
-      section.addEventListener("pointerdown", onDown);
+      window.addEventListener("pointermove", onMove, { passive: true });
+      document.documentElement.addEventListener("pointerleave", onLeave);
     }
     if (reduced) still();
     else layout();
@@ -216,9 +214,8 @@ export function HeroPlanet() {
       window.clearTimeout(resizeTimer);
       document.removeEventListener("visibilitychange", onVis);
       canvas.removeEventListener("webglcontextlost", onLost);
-      section.removeEventListener("pointermove", onMove);
-      section.removeEventListener("pointerleave", onLeave);
-      section.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointermove", onMove);
+      document.documentElement.removeEventListener("pointerleave", onLeave);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, []);
