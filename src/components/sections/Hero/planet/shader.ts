@@ -195,8 +195,8 @@ void main(){
   // sheen. Behind the globe only, under the grain.
   float sr = radians(50.0);
   vec2 sp = mat2(cos(sr), sin(sr), -sin(sr), cos(sr)) * ((css - uImg.xy) / uImg.z);
-  float st = uTime * 0.4 * 0.18;
-  float warp = fbm(sp * 1.3 + vec2(st * 0.35, -st * 0.2)) * 2.0 - 1.0;
+  float st = uTime * 0.4 * 0.6; // uSpeed 0.4, scaled so the folds visibly roll on their own
+  float warp = fbm(sp * 1.3 + vec2(st * 0.5, -st * 0.3)) * 2.0 - 1.0;
   float phase = sp.x * 5.5 * 2.2 + warp * 4.0 * 0.6 + st;
   float band = 0.5 + 0.5 * sin(phase);
   float sheen = pow(band, 5.0);
