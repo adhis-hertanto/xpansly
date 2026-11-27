@@ -51,6 +51,7 @@ ${glslColours(colourway)}
 const float S = 0.7146, BX = 0.3764, BY = 0.0243;
 const vec2 C = vec2(0.3);
 const float R = 0.5, SPREAD = 70.0, RIM = 0.003, RIMGLOW = 0.03, FADE = 0.10, SOFT0 = 0.0035;
+const float GRAIN = 0.6;        // film grain strength (1 = generator setting 55)
 const float RIM_SPREAD = 105.0; // rim outline reaches further round the horizon than the glow
 const float DGAM = 4.2, MESHS = 0.0847, HWN = 0.0010526;
 
@@ -220,7 +221,7 @@ void main(){
   float lum = (s.r + s.g + s.b) / 3.0;
   float wt = 0.30 + 1.6 * sqrt(lum) * (1.0 - lum * 0.55);
   vec4 gn = grain(css * uScale / max(1.0, shapePx * uScale / 760.0));
-  s += gn.x * 0.055 * wt + gn.yzw * 0.012 * wt;
+  s += (gn.x * 0.055 + gn.yzw * 0.012) * wt * GRAIN;
 
   // Pill dither on the lit band, on a 12 px (at 760) grid.
 #if DITHER
