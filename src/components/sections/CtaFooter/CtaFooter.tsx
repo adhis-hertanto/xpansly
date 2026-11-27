@@ -1,4 +1,6 @@
 import { Chip, Section } from "@/components/ui";
+import { PlanetCanvas } from "@/components/ui/PlanetArt/PlanetCanvas";
+import { SIGNUP_SCENE } from "@/components/ui/PlanetArt/scenes";
 import { sectionIds } from "@/config/site";
 import { EarlyAccessForm } from "./EarlyAccessForm";
 import styles from "./CtaFooter.module.css";
@@ -39,6 +41,7 @@ export function CtaSection() {
           className={styles.image}
         />
       </picture>
+      <PlanetCanvas scene={SIGNUP_SCENE} className={styles.planet} />
       <div className={styles.scrim} aria-hidden="true" />
 
       <div className={`container grid ${styles.cta}`}>

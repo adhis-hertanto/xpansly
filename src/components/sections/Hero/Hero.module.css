@@ -35,7 +35,7 @@
   object-position: 78% 30%;
 }
 
-/* Live planet (HeroPlanet) laid over the poster with the same box and crop; fades in when drawn. */
+/* Live planet (PlanetCanvas, HERO_SCENE) laid over the poster with the same box and crop; fades in when drawn. */
 .planet {
   position: absolute;
   top: 0;

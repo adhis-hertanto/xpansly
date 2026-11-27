@@ -57,14 +57,16 @@ const BLUE = hx("#0052D4");
 const PURPLE = hx("#7303C0");
 const VIOLET = hx("#EC38BC");
 const CYAN = hx("#9CECFB");
+const OR = hx("#E65C00");
+const RED = hx("#E52D27");
 const LIL = hx("#A895F2");
 const LIL2 = hx("#B9A4F6");
 
 type Stops = Array<[number, RGB]>;
 type Palette = { cool: Stops; warm: Stops; mesh: { a: RGB; b: RGB; h: RGB }; rim: string };
-export type Colourway = "violet" | "blue";
+export type Colourway = "violet" | "blue" | "ember";
 
-/** The generator's colourways (only the two the hero can use). */
+/** The generator's colourways used on the site. */
 const PALETTES: Record<Colourway, Palette> = {
   violet: {
     cool: [[0, BLACK], [0.1, add(sc(BLUE, 0.45), sc(PURPLE, 0.25))], [0.34, add(sc(BLUE, 0.8), sc(PURPLE, 0.2))], [0.58, add(sc(BLUE, 0.45), sc(LIL, 0.55))], [0.8, LIL], [1, hx("#CFC6FF")]],
@@ -77,6 +79,12 @@ const PALETTES: Record<Colourway, Palette> = {
     warm: [[0, BLACK], [0.1, add(sc(BLUE, 0.3), sc(PURPLE, 0.2))], [0.34, sc(BLUE, 0.8)], [0.6, add(sc(BLUE, 0.5), sc(CYAN, 0.5))], [0.84, CYAN], [1, hx("#FFFFFF")]],
     mesh: { a: BLUE, b: hx("#5B8CFF"), h: CYAN },
     rim: "#E6FAFF",
+  },
+  ember: {
+    cool: [[0, BLACK], [0.1, sc(OR, 0.3)], [0.34, sc(OR, 0.85)], [0.6, add(sc(OR, 0.5), sc(hx("#FFD2A8"), 0.5))], [0.82, hx("#FFD2A8")], [1, hx("#FFFFFF")]],
+    warm: [[0, BLACK], [0.1, sc(OR, 0.25)], [0.34, add(sc(OR, 0.75), sc(RED, 0.2))], [0.6, add(sc(OR, 0.6), sc(hx("#FFB777"), 0.4))], [0.84, hx("#FFE3C4")], [1, hx("#FFFFFF")]],
+    mesh: { a: OR, b: RED, h: hx("#FF9A4D") },
+    rim: "#FFE6CF",
   },
 };
 

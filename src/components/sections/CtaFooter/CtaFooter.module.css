@@ -27,6 +27,22 @@
   object-position: center;
 }
 
+/* Live version of the art (PlanetCanvas): same box and crop as the poster, fades in when drawn. */
+.planet {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.planet[data-ready] {
+  opacity: 1;
+}
+
 /* Figma 848:24335: #0A0A0A 100% at 0, 60% at 19.231%, 0% at 47.596%, top to bottom. */
 .scrim {
   position: absolute;

@@ -1,26 +1,17 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { buildLutBytes, type Colourway } from "./planet/palette";
-import { fragSource, VERT } from "./planet/shader";
-import styles from "./Hero.module.css";
+import { buildLutBytes } from "./palette";
+import { fragSource, VERT } from "./shader";
+import type { Scene } from "./scenes";
 
 /*
- * Live version of the hero planet art (see planet/shader.ts). It fades in over the static
- * poster once the first frame is drawn, and leaves the poster in place if WebGL2 is missing,
- * the context is lost, or the visitor prefers reduced motion (one still frame is drawn then).
+ * Live version of a generator poster (see shader.ts). Lay it over the poster <img> with the same
+ * box; it fades in once the first frame is drawn and leaves the poster in place without WebGL2,
+ * on context loss, or for reduced motion (one still frame is drawn then).
  * Capped at 30fps and ~2.4M buffer pixels, paused off-screen and in hidden tabs.
  */
 
-/** The poster art uses the Blue colourway with no pill dither; set "violet" / true for the saved generator settings. */
-const COLOURWAY: Colourway = "blue";
-const DITHER = false;
-
-const IMG_W = 2880;
-const IMG_H = 1778;
-const SHAPE = { S: 0.7146, BX: 0.3764, BY: 0.0243, cx: 0.3, cy: 0.3 };
-const BASE_LIGHT = -35;
-const LIGHT_RANGE = 75; // degrees either side of the resting light the pointer can swing it
 const FRAME_MS = 1000 / 30;
 const MAX_PX = 2.4e6;
 
@@ -32,7 +23,7 @@ function compile(gl: WebGL2RenderingContext, type: number, src: string) {
   return s;
 }
 
-export function HeroPlanet() {
+export function PlanetCanvas({ scene, className }: { scene: Scene; className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -45,11 +36,11 @@ export function HeroPlanet() {
     try {
       prog = gl.createProgram()!;
       gl.attachShader(prog, compile(gl, gl.VERTEX_SHADER, VERT));
-      gl.attachShader(prog, compile(gl, gl.FRAGMENT_SHADER, fragSource(COLOURWAY, DITHER)));
+      gl.attachShader(prog, compile(gl, gl.FRAGMENT_SHADER, fragSource(scene)));
       gl.linkProgram(prog);
       if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog) ?? "link");
     } catch (e) {
-      console.warn("Hero planet disabled:", e);
+      console.warn("Planet art disabled:", e);
       return;
     }
     gl.useProgram(prog);
@@ -61,7 +52,7 @@ export function HeroPlanet() {
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
     gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 3, 0, gl.RGBA, gl.UNSIGNED_BYTE, buildLutBytes(COLOURWAY));
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 3, 0, gl.RGBA, gl.UNSIGNED_BYTE, buildLutBytes(scene.colourway));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -69,15 +60,16 @@ export function HeroPlanet() {
 
     const u = (n: string) => gl.getUniformLocation(prog, n);
     const U = {
-      res: u("uRes"), scale: u("uScale"), img: u("uImg"), time: u("uTime"), seed: u("uSeed"), light: u("uLight"),
-      lineAng: u("uLineAng"), glow: u("uGlow"), hover: u("uHover"), ptr: u("uPtr"), rip: u("uRip"), lut: u("uLut"),
+      res: u("uRes"), scale: u("uScale"), img: u("uImg"), time: u("uTime"), light: u("uLight"),
+      glow: u("uGlow"), hover: u("uHover"), ptr: u("uPtr"), lut: u("uLut"),
     };
     gl.uniform1i(U.lut, 0);
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const desktop = window.matchMedia("(min-width: 1200px)");
+    const { poster, box } = scene;
 
-    // Layout: CSS size of the canvas and the cover-fitted image box inside it.
+    // Layout: CSS size of the canvas and the cover-fitted poster box inside it.
     let cw = 0, ch = 0, scale = 1, imgL = 0, imgT = 0, imgW = 1;
     const layout = () => {
       cw = canvas.clientWidth;
@@ -88,55 +80,56 @@ export function HeroPlanet() {
       canvas.width = Math.round(cw * scale);
       canvas.height = Math.round(ch * scale);
       gl.viewport(0, 0, canvas.width, canvas.height);
-      const k = Math.max(cw / IMG_W, ch / IMG_H);
-      imgW = IMG_W * k;
-      const [px, py] = desktop.matches ? [0.5, 0.5] : [0.78, 0.3]; // matches .bgImg object-position
+      const k = Math.max(cw / poster.w, ch / poster.h);
+      imgW = poster.w * k;
+      const [px, py] = desktop.matches ? poster.posDesktop : poster.pos;
       imgL = (cw - imgW) * px;
-      imgT = (ch - IMG_H * k) * py;
+      imgT = (ch - poster.h * k) * py;
       return true;
     };
-    const toShape = (x: number, y: number) => [
-      1 - ((x - imgL) / imgW - SHAPE.BX) / SHAPE.S,
-      1 - ((y - imgT) / imgW - SHAPE.BY) / SHAPE.S,
-    ];
+    const toShape = (x: number, y: number): [number, number] => {
+      const sx = ((x - imgL) / imgW - box.BX) / box.S;
+      const sy = ((y - imgT) / imgW - box.BY) / box.S;
+      return box.flip ? [1 - sx, box.asp - sy] : [sx, sy];
+    };
 
     // Interaction state, eased each frame.
     const ptr = { x: 0, y: 0, tx: 0, ty: 0, amt: 0, target: 0 };
-    let light = BASE_LIGHT;
+    let light = scene.light;
     let mouseActive = false;
     let hover = 0;
     const t0 = performance.now();
+    const mid = (scene.lightMin + scene.lightMax) / 2;
+    const span = (scene.lightMax - scene.lightMin) / 2;
 
     const draw = (now: number) => {
       const t = reduced ? 0 : (now - t0) / 1000;
       if (!mouseActive && !reduced) {
-        // No mouse over the hero (touch, or idle): a slow light drifts around the lit side of the rim.
-        const a = ((BASE_LIGHT + 180 + 28 * Math.sin(t * 0.17)) * Math.PI) / 180;
-        const r = 0.52 + 0.04 * Math.sin(t * 0.29);
-        [ptr.tx, ptr.ty] = [SHAPE.cx + r * Math.cos(a) * -1, SHAPE.cy + r * Math.sin(a)];
+        // No mouse over the art (touch, or idle): the light drifts slowly along the visible horizon.
+        const a = ((mid + span * 0.6 * Math.sin(t * 0.17)) * Math.PI) / 180;
+        const r = scene.R * 1.05;
+        [ptr.tx, ptr.ty] = [scene.C[0] + r * Math.cos(a), scene.C[1] - r * Math.sin(a)];
         ptr.target = 0.55;
       }
-      ptr.x += (ptr.tx - ptr.x) * 0.12;
-      ptr.y += (ptr.ty - ptr.y) * 0.12;
+      ptr.x += (ptr.tx - ptr.x) * 0.1;
+      ptr.y += (ptr.ty - ptr.y) * 0.1;
       ptr.amt += (ptr.target - ptr.amt) * 0.1;
       hover += ((mouseActive ? 1 : 0) - hover) * 0.08;
-      // The light follows the pointer round the horizon (within LIGHT_RANGE) and breathes when idle.
-      const pa = (Math.atan2(-(ptr.y - SHAPE.cy), ptr.x - SHAPE.cx) * 180) / Math.PI;
-      const delta = ((((pa - BASE_LIGHT + 180) % 360) + 360) % 360) - 180;
-      const goal = BASE_LIGHT + 5 * Math.sin(t * 0.11) * (1 - ptr.amt) + Math.max(-LIGHT_RANGE, Math.min(LIGHT_RANGE, delta)) * ptr.amt;
+      // The light follows the pointer round the horizon (within the scene's range) and breathes when idle.
+      const pa = (Math.atan2(-(ptr.y - scene.C[1]), ptr.x - scene.C[0]) * 180) / Math.PI;
+      const delta = ((((pa - scene.light + 180) % 360) + 360) % 360) - 180;
+      const target = Math.max(scene.lightMin, Math.min(scene.lightMax, scene.light + delta));
+      const goal = scene.light + 5 * Math.sin(t * 0.11) * (1 - ptr.amt) + (target - scene.light) * ptr.amt;
       light += (goal - light) * 0.14;
 
       gl.uniform2f(U.res, canvas.width, canvas.height);
       gl.uniform1f(U.scale, scale);
       gl.uniform3f(U.img, imgL, imgT, imgW);
       gl.uniform1f(U.time, t);
-      gl.uniform1f(U.seed, 7); // static grain
       gl.uniform1f(U.light, light);
-      gl.uniform1f(U.lineAng, BASE_LIGHT); // line art stays put
-      gl.uniform1f(U.glow, 0.55 * (1 + 0.035 * (Math.sin(t * 0.23) - 1)) + 0.07 * hover);
+      gl.uniform1f(U.glow, scene.glow * (1 + 0.035 * (Math.sin(t * 0.23) - 1)) + scene.glow * 0.13 * hover);
       gl.uniform1f(U.hover, hover);
-      gl.uniform3f(U.ptr, 0, 0, 0); // pill dither lift unused
-      gl.uniform4f(U.rip, 0, 0, 0, 0);
+      gl.uniform3f(U.ptr, ptr.x, ptr.y, hover);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
@@ -167,7 +160,11 @@ export function HeroPlanet() {
       show();
     };
 
-    // Tracked on the window so the floating nav and cards over the hero do not break the hover.
+    // Tracked on the window so overlaid content (nav, cards, forms) does not break the hover.
+    const onLeave = () => {
+      ptr.target = 0;
+      mouseActive = false;
+    };
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== "mouse" && e.pointerType !== "pen") return;
       const r = canvas.getBoundingClientRect();
@@ -177,10 +174,6 @@ export function HeroPlanet() {
       if (ptr.amt < 0.01) [ptr.x, ptr.y] = [ptr.tx, ptr.ty];
       ptr.target = 1;
       mouseActive = true;
-    };
-    const onLeave = () => {
-      ptr.target = 0;
-      mouseActive = false;
     };
 
     let resizeTimer = 0;
@@ -221,7 +214,7 @@ export function HeroPlanet() {
       document.documentElement.removeEventListener("pointerleave", onLeave);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
-  }, []);
+  }, [scene]);
 
-  return <canvas ref={ref} className={styles.planet} aria-hidden="true" />;
+  return <canvas ref={ref} className={className} aria-hidden="true" />;
 }

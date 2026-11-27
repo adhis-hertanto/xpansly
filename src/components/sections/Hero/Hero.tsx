@@ -2,7 +2,8 @@ import { Chip, Section } from "@/components/ui";
 import { sectionIds } from "@/config/site";
 import { HeroForm } from "./HeroForm";
 import { HeroVisual } from "./HeroVisual";
-import { HeroPlanet } from "./HeroPlanet";
+import { PlanetCanvas } from "@/components/ui/PlanetArt/PlanetCanvas";
+import { HERO_SCENE } from "@/components/ui/PlanetArt/scenes";
 import styles from "./Hero.module.css";
 import { ASSETS } from "@/lib/paths";
 
@@ -36,7 +37,7 @@ export function Hero() {
             className={styles.bgImg}
           />
         </picture>
-        <HeroPlanet />
+        <PlanetCanvas scene={HERO_SCENE} className={styles.planet} />
         <div className={styles.scrim} />
       </div>
 
