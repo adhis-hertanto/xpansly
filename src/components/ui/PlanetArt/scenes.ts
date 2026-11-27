@@ -77,7 +77,7 @@ export const HERO_SCENE: Scene = {
   ],
   lines: true,
   dither: null,
-  grain: 0.6,
+  grain: 0.35,
   silk: 0.024,
 };
 
@@ -115,6 +115,6 @@ export const SIGNUP_SCENE: Scene = {
   ],
   lines: false,
   dither: { style: "pix", cell: 8, inten: 70, cov: 55, brk: 35, con: 50 },
-  grain: 0.6,
+  grain: 0.35,
   silk: 0.024,
 };
