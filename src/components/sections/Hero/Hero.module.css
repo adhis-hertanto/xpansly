@@ -35,6 +35,22 @@
   object-position: 78% 30%;
 }
 
+/* Live planet (HeroPlanet) laid over the poster with the same box and crop; fades in when drawn. */
+.planet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.planet[data-ready] {
+  opacity: 1;
+}
+
 /* Figma 848:16501: #0A0A0A alpha 1 at 0%, .6 at 19.231%, 0 at 47.596%, bottom to top */
 .scrim {
   position: absolute;
@@ -145,7 +161,8 @@
     display: none;
   }
 
-  .bgImg {
+  .bgImg,
+  .planet {
     height: calc(889 * var(--u));
     object-position: center;
   }

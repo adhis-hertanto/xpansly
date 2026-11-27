@@ -2,6 +2,7 @@ import { Chip, Section } from "@/components/ui";
 import { sectionIds } from "@/config/site";
 import { HeroForm } from "./HeroForm";
 import { HeroVisual } from "./HeroVisual";
+import { HeroPlanet } from "./HeroPlanet";
 import styles from "./Hero.module.css";
 import { ASSETS } from "@/lib/paths";
 
@@ -35,6 +36,7 @@ export function Hero() {
             className={styles.bgImg}
           />
         </picture>
+        <HeroPlanet />
         <div className={styles.scrim} />
       </div>
 
