@@ -14,8 +14,8 @@ export default function Home() {
       <Nav />
       <main id="main" tabIndex={-1}>
         <Hero />
-        <Problem />
         <DitherBackdrop>
+          <Problem />
           <HowItWorks />
           <MeetMira />
           <Outcome />

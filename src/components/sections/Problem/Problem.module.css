@@ -2,7 +2,7 @@
 
 .section {
   position: relative;
-  background: #0a0a0a;
+  background: transparent; /* page dither field shows through (DitherBackdrop) */
   height: 450vh;
   height: 450svh;
 }
@@ -14,7 +14,7 @@
   height: 100svh;
   overflow: hidden;
   isolation: isolate;
-  background: #0a0a0a;
+  background: transparent; /* page dither field shows through (DitherBackdrop) */
   /* Scroll driven state, written by ProblemStage (no React renders per frame). */
   --h: 0; /* heading opacity */
   --a0: 0; /* card arrival 0..1 */

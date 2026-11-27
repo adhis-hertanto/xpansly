@@ -117,15 +117,14 @@ export function Scene({
       camera={{ fov: FOV, near: 0.1, far: 100, position: [0, 0, 11] }}
       gl={{
         antialias: !high,
-        alpha: false,
+        alpha: true,
         powerPreference: "high-performance",
-        // No tone mapping: the composer would crush the #0a0a0a background, so both paths stay linear->sRGB.
+        // Transparent so the page dither field shows through. No tone mapping: both paths stay linear->sRGB.
         toneMapping: NoToneMapping,
         toneMappingExposure: 1,
       }}
       style={{ position: "absolute", inset: 0 }}
     >
-      <color attach="background" args={["#0a0a0a"]} />
       <Framing />
       <Studio intensity={glass ? 0.55 : 0.9} />
       {/* Key accent from the upper left, and a very subtle purple rim from behind right. */}

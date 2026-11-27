@@ -11,8 +11,8 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 60svh, #000 calc(100% - 60svh), transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 60svh, #000 calc(100% - 60svh), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 40svh, #000 calc(100% - 50svh), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 40svh, #000 calc(100% - 50svh), transparent 100%);
 }
 
 /* One viewport-sized stage that rides along with the scroll. */
@@ -21,32 +21,24 @@
   top: 0;
   height: 100svh;
   overflow: hidden;
-  /* Vignette: brightest towards the edges and corners, quiet behind centred copy. */
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, rgb(0 0 0 / 0.25) 0%, #000 100%);
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, rgb(0 0 0 / 0.25) 0%, #000 100%);
+  /* Quieter behind centred copy, fuller towards the edges. */
+  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 50%, rgb(0 0 0 / 0.45) 0%, #000 100%);
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 50%, rgb(0 0 0 / 0.45) 0%, #000 100%);
 }
 
-.glow,
-.sharp {
+/* Oversized by the blur radius so the blur does not darken the viewport edges. */
+.canvas {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: -40px;
+  width: calc(100% + 80px);
+  height: calc(100% + 80px);
   display: block;
-}
-
-.glow {
-  filter: blur(7px);
-  opacity: 0.85;
+  filter: blur(18px);
   transform: translateZ(0);
 }
 
-.sharp {
-  opacity: 0.16;
-}
-
 @media (max-width: 767px) {
-  .glow {
-    filter: blur(5px);
+  .canvas {
+    filter: blur(12px);
   }
 }

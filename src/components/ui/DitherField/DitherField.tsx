@@ -4,91 +4,65 @@ import { useEffect, useRef, type ReactNode } from "react";
 import styles from "./DitherField.module.css";
 
 /*
- * Ambient dither field: a grid of brand-coloured squares whose opacity drifts with a slow
- * sine-noise field plus a per-cell twinkle. One viewport-sized canvas sits sticky behind a
- * run of sections, rendered at 1x and throttled to ~20fps. A blurred copy gives the glow,
- * a faint sharp copy keeps the pixel texture. It pauses off-screen and when the tab is hidden,
- * and draws one still frame for prefers-reduced-motion.
+ * Ambient dither field: a coarse grid of large white squares on black whose opacity drifts
+ * slowly (per-cell phase plus a slow wave across the grid), softened with a CSS blur.
+ * One viewport-sized canvas sits sticky behind a run of sections, so there are only a few
+ * dozen cells to draw. Throttled to ~20fps, paused off-screen and in hidden tabs, and a
+ * single still frame for prefers-reduced-motion.
  */
 
-// Brand ramp picks (tokens.css): purple-300, blue-400, cyan-300, white. Weights sum to 1.
-const PALETTE: ReadonlyArray<readonly [string, number]> = [
-  ["#c769ff", 0.42],
-  ["#149dff", 0.3],
-  ["#23c7ed", 0.13],
-  ["#ffffff", 0.15],
-];
 const FRAME_MS = 50;
-const MAX_ALPHA = 0.55; // per cell, before the CSS layer opacities scale it down
-const MIN_ALPHA = 0.04; // cells dimmer than this are skipped
+const MAX_ALPHA = 0.18; // brightest a cell gets (white on black)
+const MIN_ALPHA = 0.008;
 
-type Grid = { cols: number; rows: number; pitch: number; size: number; order: Uint32Array; colour: Uint8Array; phase: Float32Array; speed: Float32Array; starts: number[] };
+type Grid = { cols: number; rows: number; cell: number; ox: number; oy: number; phase: Float32Array; speed: Float32Array; tone: Float32Array };
 
 function buildGrid(w: number, h: number): Grid {
-  const small = w < 768;
-  const size = small ? 10 : 12;
-  const pitch = size + (small ? 3 : 4);
-  const cols = Math.ceil(w / pitch) + 1;
-  const rows = Math.ceil(h / pitch) + 1;
+  const cell = w < 768 ? 112 : w < 1200 ? 160 : 200;
+  const cols = Math.ceil(w / cell) + 1;
+  const rows = Math.ceil(h / cell) + 1;
   const n = cols * rows;
-  const colour = new Uint8Array(n);
   const phase = new Float32Array(n);
   const speed = new Float32Array(n);
+  const tone = new Float32Array(n);
   for (let i = 0; i < n; i++) {
-    let r = Math.random();
-    let c = 0;
-    while (c < PALETTE.length - 1 && r > PALETTE[c][1]) r -= PALETTE[c++][1];
-    colour[i] = c;
     phase[i] = Math.random() * Math.PI * 2;
-    speed[i] = 0.35 + Math.random() * 0.6;
+    speed[i] = 0.18 + Math.random() * 0.32; // one full fade every ~13-35s
+    tone[i] = 0.45 + Math.random() * 0.55; // some cells only ever reach grey
   }
-  // Visit cells colour by colour so fillStyle changes only once per colour per frame.
-  const order = new Uint32Array(n);
-  const starts: number[] = [];
-  let k = 0;
-  for (let c = 0; c < PALETTE.length; c++) {
-    starts.push(k);
-    for (let i = 0; i < n; i++) if (colour[i] === c) order[k++] = i;
-  }
-  starts.push(n);
-  return { cols, rows, pitch, size, order, colour, phase, speed, starts };
+  // Centre the grid so partial cells are split evenly between the edges.
+  return { cols, rows, cell, ox: (w - cols * cell) / 2, oy: (h - rows * cell) / 2, phase, speed, tone };
 }
 
 function draw(ctx: CanvasRenderingContext2D, g: Grid, w: number, h: number, t: number) {
   ctx.clearRect(0, 0, w, h);
-  const { cols, pitch, size, order, phase, speed, starts } = g;
-  for (let c = 0; c < PALETTE.length; c++) {
-    ctx.fillStyle = PALETTE[c][0];
-    for (let k = starts[c]; k < starts[c + 1]; k++) {
-      const i = order[k];
-      const x = i % cols;
-      const y = (i / cols) | 0;
-      // Large slow blobs (two drifting sine fields), sharpened so only patches light up.
-      let f = Math.sin(x * 0.11 + t * 0.21) * Math.sin(y * 0.13 - t * 0.17) + 0.6 * Math.sin((x + y) * 0.05 + t * 0.12);
-      f = f * 0.5 + 0.2;
-      if (f <= 0) continue;
-      const tw = 0.5 + 0.5 * Math.sin(t * speed[i] + phase[i]);
-      const a = MAX_ALPHA * f * f * tw;
+  ctx.fillStyle = "#ffffff";
+  const { cols, rows, cell, ox, oy, phase, speed, tone } = g;
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const i = y * cols + x;
+      // Per-cell fade, shaped so cells rest dark most of the time and swell briefly.
+      let s = 0.5 + 0.5 * Math.sin(t * speed[i] + phase[i]);
+      s = s * s * s;
+      // Slow diagonal wave so neighbouring cells tend to light up in loose groups.
+      const wave = 0.55 + 0.45 * Math.sin(x * 0.7 - y * 0.5 + t * 0.09);
+      const a = MAX_ALPHA * tone[i] * s * wave;
       if (a < MIN_ALPHA) continue;
-      ctx.globalAlpha = a > MAX_ALPHA ? MAX_ALPHA : a;
-      ctx.fillRect(x * pitch, y * pitch, size, size);
+      ctx.globalAlpha = a;
+      ctx.fillRect(ox + x * cell, oy + y * cell, cell, cell);
     }
   }
   ctx.globalAlpha = 1;
 }
 
 export function DitherField() {
-  const glowRef = useRef<HTMLCanvasElement>(null);
-  const sharpRef = useRef<HTMLCanvasElement>(null);
+  const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const glow = glowRef.current;
-    const sharp = sharpRef.current;
-    const host = glow?.parentElement?.parentElement; // the absolutely positioned backdrop
-    if (!glow || !sharp || !host) return;
-    const ctx = glow.getContext("2d");
-    const sctx = sharp.getContext("2d");
-    if (!ctx || !sctx) return;
+    const canvas = ref.current;
+    const host = canvas?.parentElement?.parentElement; // the absolutely positioned backdrop
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !host || !ctx) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let grid: Grid | null = null;
@@ -97,13 +71,10 @@ export function DitherField() {
     let raf = 0;
     let last = 0;
     let inView = false;
-    const t0 = performance.now();
+    const t0 = performance.now() - 20000; // start mid-cycle so cells are already varied
 
     const render = (now: number) => {
-      if (!grid) return;
-      draw(ctx, grid, w, h, reduced ? 12 : (now - t0) / 1000);
-      sctx.clearRect(0, 0, w, h);
-      sctx.drawImage(glow, 0, 0);
+      if (grid) draw(ctx, grid, w, h, reduced ? 31 : (now - t0) / 1000);
     };
     const loop = (now: number) => {
       raf = requestAnimationFrame(loop);
@@ -120,11 +91,11 @@ export function DitherField() {
       raf = 0;
     };
     const resize = () => {
-      w = glow.clientWidth;
-      h = glow.clientHeight;
+      w = canvas.clientWidth;
+      h = canvas.clientHeight;
       if (!w || !h) return;
-      glow.width = sharp.width = w;
-      glow.height = sharp.height = h;
+      canvas.width = w;
+      canvas.height = h;
       grid = buildGrid(w, h);
       render(performance.now());
     };
@@ -134,7 +105,7 @@ export function DitherField() {
       window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(resize, grid ? 150 : 0);
     });
-    ro.observe(glow);
+    ro.observe(canvas);
     const io = new IntersectionObserver(
       ([entry]) => {
         inView = entry.isIntersecting;
@@ -158,8 +129,7 @@ export function DitherField() {
 
   return (
     <div className={styles.stage}>
-      <canvas ref={glowRef} className={styles.glow} />
-      <canvas ref={sharpRef} className={styles.sharp} />
+      <canvas ref={ref} className={styles.canvas} />
     </div>
   );
 }
