@@ -70,7 +70,7 @@ export function HeroPlanet() {
     const u = (n: string) => gl.getUniformLocation(prog, n);
     const U = {
       res: u("uRes"), scale: u("uScale"), img: u("uImg"), time: u("uTime"), seed: u("uSeed"), light: u("uLight"),
-      lineAng: u("uLineAng"), glow: u("uGlow"), ptr: u("uPtr"), rip: u("uRip"), lut: u("uLut"),
+      lineAng: u("uLineAng"), glow: u("uGlow"), hover: u("uHover"), ptr: u("uPtr"), rip: u("uRip"), lut: u("uLut"),
     };
     gl.uniform1i(U.lut, 0);
 
@@ -104,6 +104,7 @@ export function HeroPlanet() {
     const ptr = { x: 0, y: 0, tx: 0, ty: 0, amt: 0, target: 0 };
     let light = BASE_LIGHT;
     let mouseActive = false;
+    let hover = 0;
     const t0 = performance.now();
 
     const draw = (now: number) => {
@@ -117,12 +118,13 @@ export function HeroPlanet() {
       }
       ptr.x += (ptr.tx - ptr.x) * 0.12;
       ptr.y += (ptr.ty - ptr.y) * 0.12;
-      ptr.amt += (ptr.target - ptr.amt) * 0.06;
+      ptr.amt += (ptr.target - ptr.amt) * 0.1;
+      hover += ((mouseActive ? 1 : 0) - hover) * 0.08;
       // The light follows the pointer round the horizon (within LIGHT_RANGE) and breathes when idle.
       const pa = (Math.atan2(-(ptr.y - SHAPE.cy), ptr.x - SHAPE.cx) * 180) / Math.PI;
       const delta = ((((pa - BASE_LIGHT + 180) % 360) + 360) % 360) - 180;
       const goal = BASE_LIGHT + 5 * Math.sin(t * 0.11) * (1 - ptr.amt) + Math.max(-LIGHT_RANGE, Math.min(LIGHT_RANGE, delta)) * ptr.amt;
-      light += (goal - light) * 0.08;
+      light += (goal - light) * 0.14;
 
       gl.uniform2f(U.res, canvas.width, canvas.height);
       gl.uniform1f(U.scale, scale);
@@ -131,7 +133,8 @@ export function HeroPlanet() {
       gl.uniform1f(U.seed, 7); // static grain
       gl.uniform1f(U.light, light);
       gl.uniform1f(U.lineAng, BASE_LIGHT); // line art stays put
-      gl.uniform1f(U.glow, 0.55 * (1 + 0.035 * (Math.sin(t * 0.23) - 1)));
+      gl.uniform1f(U.glow, 0.55 * (1 + 0.035 * (Math.sin(t * 0.23) - 1)) + 0.07 * hover);
+      gl.uniform1f(U.hover, hover);
       gl.uniform3f(U.ptr, 0, 0, 0); // pill dither lift unused
       gl.uniform4f(U.rip, 0, 0, 0, 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);

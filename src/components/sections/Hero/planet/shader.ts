@@ -11,10 +11,22 @@ import { glslColours, type Colourway } from "./palette";
  * up with the static poster underneath.
  *
  * Live additions on top of the still: the light swings round the horizon to follow the pointer
- * and breathes gently when idle. The line art and grain stay fixed.
+ * (with a brighter rim and a flare at the cursor while hovering) and breathes gently when idle,
+ * and a faint blue/cyan flow drifts behind the grain. The line art and grain stay fixed.
  */
 export const VERT = `#version 300 es
 in vec2 p;
+float vh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float vnoise(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(vh(i), vh(i + vec2(1, 0)), f.x), mix(vh(i + vec2(0, 1)), vh(i + vec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 p){
+  float v = 0.0, a = 0.5;
+  for (int i = 0; i < 4; i++) { v += a * vnoise(p); p = p * 2.03 + 17.1; a *= 0.5; }
+  return v;
+}
+
 void main(){ gl_Position = vec4(p, 0.0, 1.0); }
 `;
 
@@ -29,6 +41,7 @@ uniform float uSeed;    // grain frame
 uniform float uLight;   // light angle, degrees
 uniform float uLineAng; // geometry frame angle, degrees
 uniform float uGlow;
+uniform float uHover;   // 0..1, mouse over the hero
 uniform vec3 uPtr;      // pointer in shape space + presence 0..1
 uniform vec4 uRip;      // ripple origin (shape space), age (s), strength
 uniform sampler2D uLut;
@@ -38,6 +51,8 @@ ${glslColours(colourway)}
 const float S = 0.7146, BX = 0.3764, BY = 0.0243;
 const vec2 C = vec2(0.3);
 const float R = 0.5, SPREAD = 70.0, RIM = 0.003, RIMGLOW = 0.03, FADE = 0.10, SOFT0 = 0.0035;
+const float RIM_SPREAD = 105.0; // rim outline reaches further round the horizon than the glow
+const vec3 FLOW_BLUE = vec3(0.0, 0.0844, 0.6584), FLOW_CYAN = vec3(0.3325, 0.8388, 0.9647);
 const float DGAM = 4.2, MESHS = 0.0847, HWN = 0.0010526;
 
 float ss(float a, float b, float x){ float t = clamp((x - a) / (b - a), 0.0, 1.0); return t * t * (3.0 - 2.0 * t); }
@@ -122,6 +137,17 @@ vec4 grain(vec2 px){
   return vec4((h.x + h.y - 1.0) * 2.9, (h.z - 0.5) * 4.2, (h.w - 0.5) * 4.2, (fract(h.x * 91.7) - 0.5) * 4.2);
 }
 
+float vh(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float vnoise(vec2 p){
+  vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(vh(i), vh(i + vec2(1, 0)), f.x), mix(vh(i + vec2(0, 1)), vh(i + vec2(1, 1)), f.x), f.y);
+}
+float fbm(vec2 p){
+  float v = 0.0, a = 0.5;
+  for (int i = 0; i < 4; i++) { v += a * vnoise(p); p = p * 2.03 + 17.1; a *= 0.5; }
+  return v;
+}
+
 void main(){
   vec2 css = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y) / uScale;
   vec2 uv = toShape(css);
@@ -137,7 +163,8 @@ void main(){
   float hue = pow(clamp(0.5 + 0.62 * sin(radians(dth)), 0.0, 1.0), 1.4);
   vec3 c0 = mix(lut(0.0, field), lut(1.0, field), hue);
   float inner = exp(-ins / (R * 0.16)) * 0.10 * (0.2 + 0.8 * ang);
-  float soft = SOFT0 + FADE * pow(1.0 - ang, 1.6) * (0.4 + 0.6 * ss(0.0, 0.5, uv.y));
+  float ar = dth / RIM_SPREAD, angR = exp(-ar * ar);
+  float soft = SOFT0 + FADE * pow(1.0 - angR, 1.6) * (0.4 + 0.6 * ss(0.0, 0.5, uv.y));
   float sm = sg(d / soft);
   vec3 col = mix(lut(2.0, inner * 4.0), c0, sm);
 
@@ -154,9 +181,22 @@ void main(){
     col = mix(col, mix(vec3(1.0), LAD, t), al);
   }
 
-  float rl = exp(-(d / RIM) * (d / RIM)) * (0.1 + 0.9 * pow(ang, 1.3)) * (1.0 - 0.65 * min(1.0, soft / (SOFT0 + FADE)));
-  float bg = exp(-abs(d) / RIMGLOW) * (0.05 + 0.95 * ang) * 0.4;
+  // Rim outline: full strength over a wider arc; under hover it thickens and brightens at the light.
+  float rimW = RIM * (1.0 + 0.8 * uHover * ang);
+  float rl = exp(-(d / rimW) * (d / rimW)) * (0.1 + 0.9 * pow(angR, 1.1)) * (1.0 - 0.65 * min(1.0, soft / (SOFT0 + FADE))) * (1.0 + 0.6 * uHover);
+  float bg = exp(-abs(d) / (RIMGLOW * (1.0 + 0.5 * uHover))) * (0.05 + 0.95 * angR) * 0.4 * (1.0 + 0.5 * uHover);
   col += rl * RIMC * 0.95 + bg * BLC * 0.30;
+  // Hover flare: a hot spot on the rim where the cursor points, with a soft halo round it.
+  float fa = dth / 16.0;
+  float flare = uHover * exp(-fa * fa) * (exp(-(d / (RIM * 1.8)) * (d / (RIM * 1.8))) * 1.4 + exp(-abs(d) / 0.06) * 0.35);
+  col += flare * mix(RIMC, vec3(1.0), 0.5);
+
+  // Ambient flow: slow domain-warped noise in the globe's blues behind the grain, outside the planet.
+  vec2 fq = css / 560.0;
+  float n1 = fbm(fq + vec2(uTime * 0.016, -uTime * 0.010));
+  float n2 = fbm(fq * 1.6 + vec2(-uTime * 0.012, uTime * 0.018) + n1 * 1.6);
+  vec3 flow = mix(FLOW_BLUE, FLOW_CYAN, ss(0.5, 0.85, n2)) * ss(0.38, 0.8, n1) * 0.010 + ss(0.8, 0.97, n2) * 0.003;
+  col += flow * sm;
 
   // Mesh veil: five soft colour blobs.
   float mk = (0.8 + 0.2 * (1.0 - sm)) * 0.9;
